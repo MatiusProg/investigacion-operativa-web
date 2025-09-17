@@ -1,6 +1,6 @@
 # Proyecto Métodos - Investigación Operativa
 
-Web para resolver problemas de investigación operativa usando el método gráfico (de momento).
+Web para resolver problemas de investigación operativa usando el método gráfico (de momento). El dia de hoy comenzamos con el trabaajo arduo
 
 ## Equipo
 - [Luis Mateo Hurtado Castro]
