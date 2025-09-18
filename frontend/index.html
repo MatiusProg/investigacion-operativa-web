@@ -9,12 +9,24 @@
 
 <body>
 
+    <!-- Botón para mostrar/ocultar menú -->
+    <button id="menuToggle">☰ Menú</button>
+
     <!-- Menú lateral -->
     <aside class="sidebar">
         <h2>Menú</h2>
         <ul>
             <li><a href="#">Inicio</a></li>
-            <li><a href="#">Integrantes</a></li>
+            
+            <li>
+                <input type="checkbox" id="toggleIntegrantes" hidden>
+                <label for="toggleIntegrantes" class="submenu-label">Integrantes ▾</label>
+                <ul class="submenu">
+                    <li>Karen Paola Ortega Mancilla</li>
+                    <li>Luis Mateo Hurtado Castro</li>
+                    <li>Marcos David Andrade Nova</li>
+                </ul>
+            </li>
             <li><a href="#">Configuración</a></li>
         </ul>
     </aside>
@@ -70,5 +82,16 @@
     <!-- Librería Chart.js y script -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
+
+    <!-- Script para mostrar/ocultar menú -->
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
+
