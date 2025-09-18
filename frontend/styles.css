@@ -1,74 +1,225 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investigación Operativa</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-<body>
+/* Layout principal */
+body {
+  display: flex;
+  background: #f5f7fa;
+  color: #333;
+}
 
-    <!-- Menú lateral -->
-    <aside class="sidebar">
-        <h2>Menú</h2>
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Integrantes</a></li>
-            <li><a href="#">Configuración</a></li>
-        </ul>
-    </aside>
+/* Botón de menú */
+#menuToggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+  font-size: 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    <!-- Contenido principal -->
-    <main class="content">
-        <header>
-            <h1>INVESTIGACIÓN OPERATIVA</h1>
-        </header>
+/* Menú lateral */
+.sidebar {
+  position: fixed;
+  left: -250px; /* Oculto por defecto */
+  top: 0;
+  width: 200px;
+  background: #ddd;
+  padding: 20px;
+  height: 100%;
+  transition: left 0.3s;
+  z-index: 500;
+}
 
-        <!-- Sección principal -->
-        <section class="card">
-            <h2>Método Gráfico</h2>
-            <p class="subtitle">Problemas de 2 variables</p>
+.sidebar.active {
+  left: 0;
+}
 
-            <div class="datos">
-                <h3>Datos del Problema</h3>
-                <p><b>Función Objetivo (Z)</b></p>
-                <input type="text" placeholder="Max Z = 3x + 2y">
+.sidebar h2 {
+  margin-bottom: 15px;
+}
 
-                <p><b>Restricciones</b></p>
-                <div id="restricciones">
-                    <input type="text" placeholder="3x + 2y <= 12">
-                </div>
-                <a href="#" class="link" id="addRestriccion">Añadir otra Restricción</a>
-            </div>
+.sidebar ul {
+  list-style: none;
+}
 
-            <button class="btn-resolver">Resolver</button>
-        </section>
+.sidebar ul li {
+  margin-bottom: 10px;
+}
 
-        <!-- Gráfico -->
-        <section class="card">
-            <h3>Gráfico Interactivo</h3>
-            <canvas id="grafico" width="400" height="300"></canvas>
-        </section>
+.sidebar ul li a {
+  text-decoration: none;
+  color: #000;
+  background: #fff;
+  padding: 10px 15px;
+  display: block;
+  border-radius: 6px;
+  transition: 0.3s;
+}
 
-        <!-- Solución -->
-        <section class="card" id="solucion">
-            <h3>Solución Óptima</h3>
-            <p>Los resultados se mostrarán aquí</p>
-        </section>
+.sidebar ul li a:hover {
+  background: #bbb;
+}
 
-        <!-- Navegación inferior -->
-        <footer>
-            <nav>
-                <a href="#">Gráfico</a>
-                <a href="#">Simplex</a>
-                <a href="#">Más</a>
-            </nav>
-        </footer>
-    </main>
+/* Submenú oculto por defecto */
+.submenu {
+  display: none;
+  list-style: disc;
+  padding-left: 20px;
+  margin-top: 5px;
+}
 
-    <!-- Librería Chart.js y script -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+.submenu li {
+  padding: 5px 0;
+}
+
+/* Checkbox activador del submenú */
+#toggleIntegrantes:checked + .submenu-label + .submenu {
+  display: block;
+}
+
+/* Estilo del label para que parezca botón */
+.submenu-label {
+  display: block;
+  cursor: pointer;
+  padding: 10px 15px;
+  background: #fff;
+  border-radius: 6px;
+  color: #000;
+  text-decoration: none;
+}
+
+.submenu-label:hover {
+  background: #bbb;
+}
+
+/* Contenido */
+.content {
+  flex: 1;
+  padding: 20px;
+  margin-left: 0; /* se ajusta con el menú */
+  transition: margin-left 0.3s;
+}
+
+/* Encabezado */
+header {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Tarjetas */
+.card {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card h2, .card h3 {
+  margin-bottom: 10px;
+}
+
+.card .subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Inputs */
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Enlaces */
+.link {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Botón resolver */
+.btn-resolver {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(to right, #007bff, #00c6ff);
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-resolver:hover {
+  opacity: 0.9;
+}
+
+/* Footer nav */
+footer {
+  background: #fff;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+footer nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+footer nav a:hover {
+  color: #007bff;
+}
+
+/* RESPONSIVIDAD */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    text-align: center;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  header h1 {
+    font-size: 16px;
+  }
+
+  .btn-resolver {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
