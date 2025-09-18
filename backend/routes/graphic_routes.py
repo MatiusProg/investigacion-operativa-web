@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type:ignore
 from flask import Blueprint, request, jsonify
 import sys
 import os
@@ -32,3 +33,19 @@ def solve_problem():
 @graphic_bp.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "OK", "message": "Graphic method API is running"})
+@graphic_bp.route('/solve/interactive', methods=['POST'])
+def solve_interactive():
+    try:
+        data = request.get_json()
+        
+        if not data or 'objective' not in data or 'constraints' not in data:
+            return jsonify({"error": "Datos incompletos"}), 400
+        
+        from utils.plotly_graphic import InteractiveLinearProgramming
+        problem = InteractiveLinearProgramming(data['objective'], data['constraints'])
+        
+        result = problem.solve_interactive()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
