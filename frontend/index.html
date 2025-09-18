@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigación Operativa</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Integrantes</a></li>
+            <li><a href="#">Configuración</a></li>
+        </ul>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="content">
+        <header>
+            <h1>INVESTIGACIÓN OPERATIVA</h1>
+        </header>
+
+        <!-- Sección principal -->
+        <section class="card">
+            <h2>Método Gráfico</h2>
+            <p class="subtitle">Problemas de 2 variables</p>
+
+            <div class="datos">
+                <h3>Datos del Problema</h3>
+                <p><b>Función Objetivo (Z)</b></p>
+                <input type="text" placeholder="Max Z = 3x + 2y">
+
+                <p><b>Restricciones</b></p>
+                <div id="restricciones">
+                    <input type="text" placeholder="3x + 2y <= 12">
+                </div>
+                <a href="#" class="link" id="addRestriccion">Añadir otra Restricción</a>
+            </div>
+
+            <button class="btn-resolver">Resolver</button>
+        </section>
+
+        <!-- Gráfico -->
+        <section class="card">
+            <h3>Gráfico Interactivo</h3>
+            <canvas id="grafico" width="400" height="300"></canvas>
+        </section>
+
+        <!-- Solución -->
+        <section class="card" id="solucion">
+            <h3>Solución Óptima</h3>
+            <p>Los resultados se mostrarán aquí</p>
+        </section>
+
+        <!-- Navegación inferior -->
+        <footer>
+            <nav>
+                <a href="#">Gráfico</a>
+                <a href="#">Simplex</a>
+                <a href="#">Más</a>
+            </nav>
+        </footer>
+    </main>
+
+    <!-- Librería Chart.js y script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
