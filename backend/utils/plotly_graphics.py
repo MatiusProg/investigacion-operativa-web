@@ -3,7 +3,10 @@
 import plotly.graph_objects as go
 import plotly.io as pio
 import numpy as np
-from .graphic_method import LinearProgrammingProblem
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.graphic_method import LinearProgrammingProblem
 
 class InteractiveLinearProgramming(LinearProgrammingProblem):
     def create_interactive_plot(self, feasible_points, optimal_point):
