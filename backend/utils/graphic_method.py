@@ -119,6 +119,46 @@ class LinearProgrammingProblem:
                 intersections.append((0, right_side / b))
         
         return intersections
+    def parse_objective(self, objective_str):
+        """Parsea la función objetivo de manera más robusta"""
+        # Limpiar y normalizar la cadena
+        clean_str = objective_str.lower().replace(" ", "").replace("maximize", "").replace("minimize", "").replace("max", "").replace("min", "")
+        
+        # Determinar tipo de optimización
+        if "max" in objective_str.lower():
+            obj_type = "max"
+        else:
+            obj_type = "min"
+        
+        # Usar expresión regular para encontrar coeficientes
+        import re
+        
+        coef_x = 0
+        coef_y = 0
+        
+        # Buscar coeficiente para x
+        x_match = re.search(r'([+-]?\d*\.?\d*)x', clean_str)
+        if x_match:
+            coef_str = x_match.group(1)
+            if coef_str in ['', '+']:
+                coef_x = 1
+            elif coef_str == '-':
+                coef_x = -1
+            else:
+                coef_x = float(coef_str)
+        
+        # Buscar coeficiente para y
+        y_match = re.search(r'([+-]?\d*\.?\d*)y', clean_str)
+        if y_match:
+            coef_str = y_match.group(1)
+            if coef_str in ['', '+']:
+                coef_y = 1
+            elif coef_str == '-':
+                coef_y = -1
+            else:
+                coef_y = float(coef_str)
+        
+        return obj_type, coef_x, coef_y
 
     def solve(self):
         all_points = self.find_all_intersections()
@@ -132,83 +172,7 @@ class LinearProgrammingProblem:
         if not feasible_points:
             return {"error": "No existe solucion factible"}
         
-        # PARSER CORREGIDO para la función objetivo
-        if "maximize" in self.objective:
-            obj_type = "max"
-            expr = self.objective.replace("maximize", "").strip()
-        else:
-            obj_type = "min" 
-            expr = self.objective.replace("minimize", "").strip()
-        
-        obj_x, obj_y = 0.0, 0.0
-        
-        # Método MEJORADO para parsear función objetivo
-        # Limpiar la expresión
-        expr = expr.replace(' ', '')
-        
-        # Buscar coeficiente de x
-        if 'x' in expr:
-            x_index = expr.find('x')
-            if x_index == 0:
-                obj_x = 1.0
-            else:
-                # Tomar todo antes de x
-                before_x = expr[:x_index]
-                if before_x == '+':
-                    obj_x = 1.0
-                elif before_x == '-':
-                    obj_x = -1.0
-                else:
-                    # Extraer número
-                    num_str = ''
-                    for char in reversed(before_x):
-                        if char in '+-':
-                            break
-                        num_str = char + num_str
-                    
-                    if num_str == '':
-                        obj_x = 1.0 if before_x.endswith('+') else -1.0
-                    else:
-                        try:
-                            obj_x = float(num_str)
-                            if before_x.startswith('-'):
-                                obj_x = -obj_x
-                        except ValueError:
-                            obj_x = 1.0
-        
-        # Buscar coeficiente de y (similar)
-        if 'y' in expr:
-            y_index = expr.find('y')
-            if y_index == 0:
-                obj_y = 1.0
-            else:
-                before_y = expr[:y_index]
-                if before_y == '+':
-                    obj_y = 1.0
-                elif before_y == '-':
-                    obj_y = -1.0
-                else:
-                    num_str = ''
-                    for char in reversed(before_y):
-                        if char in '+-':
-                            break
-                        num_str = char + num_str
-                    
-                    if num_str == '':
-                        obj_y = 1.0 if before_y.endswith('+') else -1.0
-                    else:
-                        try:
-                            obj_y = float(num_str)
-                            if before_y.startswith('-'):
-                                obj_y = -obj_y
-                        except ValueError:
-                            obj_y = 1.0
-        
-        # Si no encontró coeficientes, usar valores por defecto
-        if obj_x == 0.0 and 'x' in expr:
-            obj_x = 1.0
-        if obj_y == 0.0 and 'y' in expr:
-            obj_y = 1.0
+        obj_type, obj_x, obj_y = self.parse_objective(self.objective)
         
         best_value = float('-inf') if obj_type == "max" else float('inf')
         best_point = None
