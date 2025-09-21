@@ -5,6 +5,11 @@ import base64
 from io import BytesIO
 import numpy as np
 
+# SOLUCIÓN PARA EL ERROR DE MATPLOTLIB EN THREADS
+import matplotlib
+matplotlib.use('Agg')  # ← ¡IMPORTANTE! Usar backend no interactivo
+import matplotlib.pyplot as plt
+
 class LinearProgrammingProblem:
     def __init__(self, objective, constraints):
         self.objective = objective
