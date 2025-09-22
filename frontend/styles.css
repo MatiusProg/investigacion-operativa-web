@@ -419,6 +419,8 @@ input[type="text"] {
   width: 100% !important;
   height: 500px !important;
   max-width: 900px !important;
+  transform: scale(0.85); /* ← REDUCE EL TAMAÑO */
+  transform-origin: center center;
 }
 
 /* SVG dentro de Plotly */
@@ -426,6 +428,10 @@ input[type="text"] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
+}
+#plotly-container .js-plotly-plot {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Barra de herramientas de Plotly */
@@ -645,6 +651,7 @@ footer nav a:hover {
   }
   
   #plotly-container .plotly-graph-div {
+    transform: scale(0.75); /* ← MÁS REDUCCIÓN EN MÓVIL */
     height: 450px !important;
   }
   .modebar {
@@ -670,6 +677,7 @@ footer nav a:hover {
   }
   
   #plotly-container .plotly-graph-div {
+    transform: scale(0.65); /* ← MÁXIMA REDUCCIÓN */
     height: 400px !important;
   }
   
