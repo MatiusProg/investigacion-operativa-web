@@ -237,9 +237,10 @@ class InteractiveLinearProgramming(LinearProgrammingProblem):
             traceback.print_exc()
             return None
 
-    def solve_interactive(self):
+    def solve_interactive(self, optimization_type="maximize"):
         """Resuelve y retorna gráfico interactivo"""
-        result = self.solve()
+        # Pasa el optimization_type al solve
+        result = self.solve(optimization_type=optimization_type)
         
         if "error" in result:
             return result

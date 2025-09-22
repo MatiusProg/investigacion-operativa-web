@@ -3,16 +3,59 @@ const API_URL = 'http://localhost:5000/api/graphic';
 // Estado de la aplicación
 let currentSolution = null;
 let currentTab = 'interactive';
-let plotlyLoaded = false;
+let optimizationType = 'maximize';
+
+// Función para cambiar tipo de optimización
+function cambiarTipoOptimizacion(tipo) {
+    optimizationType = tipo;
+    
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.querySelector(`.opt-btn[data-type="${tipo}"]`).classList.add('active');
+    console.log('Tipo de optimización:', optimizationType);
+}
+
+// Función para obtener restricciones
+function obtenerRestricciones() {
+    return Array.from(document.querySelectorAll('#restricciones input'))
+        .map(input => input.value.trim())
+        .filter(r => r !== '');
+}
+
+// Función para eliminar restricción
+function eliminarRestriccion(boton) {
+    const restrictionItem = boton.closest('.restriction-item');
+    if (restrictionItem) {
+        restrictionItem.remove();
+    }
+    
+    const restricciones = document.querySelectorAll('#restricciones .restriction-item');
+    if (restricciones.length === 0) {
+        añadirRestriccion();
+    }
+}
+
+// Función para añadir restricción
+function añadirRestriccion() {
+    const restriccionesDiv = document.getElementById('restricciones');
+    const newItem = document.createElement('div');
+    newItem.className = 'restriction-item';
+    newItem.innerHTML = `
+        <input type="text" placeholder="Ej: 2x + y <= 100">
+        <button class="btn-remove-restriction" onclick="eliminarRestriccion(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    restriccionesDiv.appendChild(newItem);
+}
 
 // Función principal para resolver
 async function resolverProblema() {
-    const funcionObjetivo = document.querySelector('input[placeholder="Max Z = 3x + 2y"]').value;
-    const restricciones = Array.from(document.querySelectorAll('#restricciones input'))
-        .map(input => input.value.trim())
-        .filter(r => r !== '');
+    const funcionObjetivo = document.getElementById('funcionObjetivo').value;
+    const restricciones = obtenerRestricciones();
 
-    // Validar
     if (!funcionObjetivo) {
         alert('Por favor, ingrese la función objetivo');
         return;
@@ -24,7 +67,6 @@ async function resolverProblema() {
     }
 
     try {
-        // Mostrar loading
         document.getElementById('solucion').innerHTML = `
             <div class="loading-container">
                 <h3>Solución Óptima</h3>
@@ -33,14 +75,18 @@ async function resolverProblema() {
             </div>
         `;
 
-        // Llamar a la API interactiva
         const response = await fetch(`${API_URL}/solve/interactive`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ objective: funcionObjetivo, constraints: restricciones })
+            body: JSON.stringify({ 
+                objective: funcionObjetivo, 
+                constraints: restricciones,
+                optimization_type: optimizationType
+            })
         });
 
         const data = await response.json();
+        console.log('📊 Datos recibidos:', data);
 
         if (data.error) {
             alert('Error: ' + data.error);
@@ -59,7 +105,7 @@ async function resolverProblema() {
 function mostrarResultados(data, tab) {
     currentTab = tab;
     
-    let html = `
+    let solucionHTML = `
         <div class="results-header">
             <h3>Solución Óptima</h3>
             <div class="tab-buttons">
@@ -71,182 +117,179 @@ function mostrarResultados(data, tab) {
                 </button>
             </div>
         </div>
-        
-        <div class="results-content">
-            <div class="numeric-results">
-                <p><strong>Punto óptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
-                <p><strong>Valor óptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
-                <p><strong>Vértices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
-            </div>
+        <div class="numeric-results">
+            <p><strong>Punto óptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
+            <p><strong>Valor óptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
+            <p><strong>Vértices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
+        </div>
     `;
 
+    let graficoHTML = '';
+    
     if (tab === 'interactive' && data.interactive_plot) {
-        html += `
+        graficoHTML = `
             <div class="plot-container">
                 <h4>Gráfico Interactivo</h4>
-                <div id="plotly-placeholder" class="plotly-loading">
-                    <div class="plotly-spinner"></div>
-                    <p>Preparando visualización interactiva...</p>
-                </div>
-                <div id="plotly-container" style="display: none;"></div>
+                <div id="plotly-container">${data.interactive_plot}</div>
             </div>
         `;
     } else if (tab === 'static' && data.plot) {
-        html += `
+        graficoHTML = `
             <div class="plot-container">
                 <h4>Gráfico para Exportar</h4>
                 <img src="data:image/png;base64,${data.plot}" alt="Gráfico" class="export-image">
-                <button class="btn-export" onclick="exportarPNG()">
-                    💾 Descargar PNG
-                </button>
+                <button class="btn-export" onclick="exportarPNG()">💾 Descargar PNG</button>
             </div>
         `;
+    } else {
+        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualización</p>`;
     }
 
-    html += `</div>`;
-    document.getElementById('solucion').innerHTML = html;
+    document.getElementById('solucion').innerHTML = solucionHTML;
+    document.getElementById('grafico-interactivo').innerHTML = graficoHTML;
 
-    // Cargar Plotly de manera diferida
     if (tab === 'interactive' && data.interactive_plot) {
-        cargarPlotlyDiferido(data.interactive_plot);
+        setTimeout(initializePlotlyInteractive, 300);
     }
 }
 
-// Función NUEVA: Carga diferida de Plotly
-function cargarPlotlyDiferido(plotlyHtml) {
+// Función para inicializar Plotly
+function initializePlotlyInteractive() {
     const container = document.getElementById('plotly-container');
-    const placeholder = document.getElementById('plotly-placeholder');
+    if (!container) return;
     
-    if (!container || !placeholder) return;
+    console.log('✅ Inicializando gráfico interactivo...');
     
-    // Paso 1: Insertar el HTML pero mantenerlo oculto
-    container.innerHTML = plotlyHtml;
-    
-    // Paso 2: Esperar a que Plotly.js esté completamente cargado
+    // Esperar a que Plotly esté disponible
     const checkPlotlyLoaded = setInterval(() => {
         if (typeof Plotly !== 'undefined') {
             clearInterval(checkPlotlyLoaded);
-            plotlyLoaded = true;
-            inicializarPlotlyDefinitivo(container, placeholder);
+            console.log('🎯 Plotly cargado, ejecutando scripts...');
+            ejecutarScriptsPlotly();
+            
+            // Verificar después de un tiempo si se renderizó
+            setTimeout(() => {
+                const plotlyDiv = container.querySelector('.plotly-graph-div');
+                if (!plotlyDiv || plotlyDiv.children.length === 0) {
+                    console.log('⚠️  Gráfico no renderizado, intentando recrear...');
+                    recrearPlotlyDesdeDatos();
+                } else {
+                    console.log('✅ Gráfico interactivo mostrado correctamente');
+                }
+            }, 1000);
         }
     }, 100);
     
     // Timeout de seguridad
     setTimeout(() => {
-        if (!plotlyLoaded) {
-            clearInterval(checkPlotlyLoaded);
-            console.log('Plotly no se cargó en 5 segundos, intentando forzar...');
-            forzarCargaPlotly(container, placeholder);
+        clearInterval(checkPlotlyLoaded);
+        if (typeof Plotly === 'undefined') {
+            console.log('⏰ Timeout: Cargando Plotly manualmente...');
+            cargarPlotlyManualmente();
         }
     }, 5000);
 }
 
-// Función para inicializar Plotly de manera definitiva
-function inicializarPlotlyDefinitivo(container, placeholder) {
-    // Ocultar placeholder y mostrar contenedor
-    placeholder.style.display = 'none';
-    container.style.display = 'block';
+// Función para ejecutar scripts de Plotly
+function ejecutarScriptsPlotly() {
+    const scripts = document.querySelectorAll('#plotly-container script');
+    console.log(`📜 Encontrados ${scripts.length} scripts`);
     
-    // Ejecutar scripts de Plotly
-    const scripts = container.querySelectorAll('script');
-    scripts.forEach(script => {
-        const newScript = document.createElement('script');
-        
-        if (script.src) {
-            newScript.src = script.src;
-            newScript.async = false; // Importante: sincrónico
-        } else {
-            newScript.textContent = script.textContent;
-        }
-        
-        document.head.appendChild(newScript);
-    });
-    
-    console.log('✅ Plotly inicializado correctamente');
-    
-    // Verificar que el gráfico se renderizó
-    setTimeout(() => {
-        const plotlyDiv = container.querySelector('.plotly-graph-div');
-        if (plotlyDiv && plotlyDiv.children.length > 0) {
-            console.log('✅ Gráfico de Plotly renderizado');
-        } else {
-            console.log('⚠️  Gráfico no se renderizó, recreando...');
-            recrearPlotlyManual(container);
-        }
-    }, 1000);
-}
-
-// Función para forzar la carga de Plotly
-function forzarCargaPlotly(container, placeholder) {
-    // Cargar Plotly.js manualmente si no está cargado
+    // Verificar si Plotly está cargado primero
     if (typeof Plotly === 'undefined') {
-        const plotlyScript = document.createElement('script');
-        plotlyScript.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
-        plotlyScript.onload = () => {
-            plotlyLoaded = true;
-            inicializarPlotlyDefinitivo(container, placeholder);
-        };
-        document.head.appendChild(plotlyScript);
-    } else {
-        inicializarPlotlyDefinitivo(container, placeholder);
+        console.log('⏳ Plotly no está cargado, esperando...');
+        setTimeout(ejecutarScriptsPlotly, 100);
+        return;
     }
-}
-
-// Función para recrear Plotly manualmente (último recurso)
-function recrearPlotlyManual(container) {
-    const plotlyDiv = container.querySelector('.plotly-graph-div');
-    if (!plotlyDiv) return;
     
-    const plotId = plotlyDiv.id;
-    const script = container.querySelector('script');
-    
-    if (!script) return;
-    
-    try {
-        // Buscar el código de inicialización de Plotly
-        const scriptContent = script.textContent;
-        const plotlyInitMatch = scriptContent.match(/Plotly\.newPlot\(['"]([^'"]+)['"],\s*(\[.*?\]),\s*(\{.*?\}),\s*(\{.*?\})\)/s);
-        
-        if (plotlyInitMatch) {
-            const [_, id, dataStr, layoutStr, configStr] = plotlyInitMatch;
-            
-            // Parsear y recrear el gráfico
-            const data = JSON.parse(dataStr);
-            const layout = JSON.parse(layoutStr);
-            const config = JSON.parse(configStr);
-            
-            // Limpiar y recrear
-            container.innerHTML = `<div id="${plotId}"></div>`;
-            Plotly.newPlot(plotId, data, layout, config);
-            
-            console.log('✅ Plotly recreado manualmente');
+    scripts.forEach((script, index) => {
+        try {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+                newScript.async = true;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.head.appendChild(newScript);
+            console.log(`✅ Script ${index + 1} ejecutado`);
+        } catch (error) {
+            console.log(`❌ Error en script ${index + 1}:`, error);
         }
-    } catch (error) {
-        console.error('Error recreando Plotly:', error);
+    });
+}
+
+// Método manual alternativo
+function initializePlotlyManual(plotlyHtml) {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = plotlyHtml;
+    
+    const plotlyDiv = tempDiv.querySelector('.plotly-graph-div');
+    const scripts = tempDiv.querySelectorAll('script');
+    
+    if (plotlyDiv) {
+        container.innerHTML = '';
+        container.appendChild(plotlyDiv.cloneNode(true));
+        
+        scripts.forEach(script => {
+            if (script.textContent.includes('Plotly.newPlot')) {
+                try {
+                    eval(script.textContent);
+                } catch (error) {
+                    console.log('Error ejecutando script manual:', error);
+                }
+            }
+        });
     }
 }
 
-// Función para cambiar entre pestañas
+// Función para cambiar pestañas
+// Función para cambiar pestañas
 async function cambiarPestaña(tab) {
     if (!currentSolution) return;
     
-    if (tab === 'static' && !currentSolution.plot) {
+    // Si vamos a interactivo y ya tenemos el gráfico, solo mostrarlo
+    if (tab === 'interactive' && currentSolution.interactive_plot) {
+        mostrarResultados(currentSolution, tab);
+        return;
+    }
+    
+    document.getElementById('grafico-interactivo').innerHTML = `
+        <div class="plotly-loading">
+            <div class="plotly-spinner"></div>
+            <p>Cargando ${tab === 'interactive' ? 'interactivo' : 'exportar'}...</p>
+        </div>
+    `;
+    
+    if (tab === 'static') {
         try {
-            const funcionObjetivo = document.querySelector('input[placeholder="Max Z = 3x + 2y"]').value;
-            const restricciones = Array.from(document.querySelectorAll('#restricciones input'))
-                .map(input => input.value.trim())
-                .filter(r => r !== '');
-            
-            const response = await fetch(`${API_URL}/solve/static`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ objective: funcionObjetivo, constraints: restricciones })
-            });
-            
-            const staticData = await response.json();
-            currentSolution.plot = staticData.plot;
+            if (!currentSolution.plot) {
+                const response = await fetch(`${API_URL}/solve/static`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        objective: document.getElementById('funcionObjetivo').value, 
+                        constraints: obtenerRestricciones(),
+                        optimization_type: optimizationType
+                    })
+                });
+                
+                const staticData = await response.json();
+                if (staticData.error) throw new Error(staticData.error);
+                
+                currentSolution.plot = staticData.plot;
+            }
         } catch (error) {
-            console.error('Error obteniendo gráfico estático:', error);
+            document.getElementById('grafico-interactivo').innerHTML = `
+                <div class="error-container">
+                    <p>Error: ${error.message}</p>
+                    <button class="btn-retry" onclick="cambiarPestaña('static')">Reintentar</button>
+                </div>
+            `;
+            return;
         }
     }
     
@@ -255,8 +298,8 @@ async function cambiarPestaña(tab) {
 
 // Función para exportar PNG
 function exportarPNG() {
-    if (!currentSolution || !currentSolution.plot) {
-        alert('No hay gráfico disponible para exportar');
+    if (!currentSolution?.plot) {
+        alert('No hay gráfico para exportar');
         return;
     }
 
@@ -266,20 +309,24 @@ function exportarPNG() {
     link.click();
 }
 
-// Función para añadir restricciones
-function añadirRestriccion() {
-    const restriccionesDiv = document.getElementById('restricciones');
-    const newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.placeholder = 'Ej: 2x + 3y <= 100';
-    newInput.className = 'restriction-input';
-    restriccionesDiv.appendChild(newInput);
-}
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    // Conectar botones
+    // Botones de optimización
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            cambiarTipoOptimizacion(this.dataset.type);
+        });
+    });
+    
+    // Cerrar menú
+    document.getElementById('closeMenu').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.remove('active');
+    });
+    
+    // Botón resolver
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
+    
+    // Añadir restricción
     document.getElementById('addRestriccion').addEventListener('click', function(e) {
         e.preventDefault();
         añadirRestriccion();
@@ -287,3 +334,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Aplicación inicializada');
 });
+// Función para cargar Plotly manualmente
+function cargarPlotlyManualmente() {
+    if (typeof Plotly === 'undefined') {
+        console.log('📦 Cargando Plotly desde CDN...');
+        const script = document.createElement('script');
+        script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
+        script.onload = function() {
+            console.log('✅ Plotly cargado manualmente');
+            ejecutarScriptsPlotly();
+        };
+        document.head.appendChild(script);
+    } else {
+        ejecutarScriptsPlotly();
+    }
+}
+// Función para recrear Plotly desde los datos
+function recrearPlotlyDesdeDatos() {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    const script = container.querySelector('script');
+    if (!script) return;
+    
+    try {
+        // Extraer datos del script
+        const scriptContent = script.textContent;
+        const newPlotMatch = scriptContent.match(/Plotly\.newPlot\(['"]([^'"]+)['"],\s*(\[.*?\]),\s*(\{.*?\}),\s*(\{.*?\})\)/s);
+        
+        if (newPlotMatch && typeof Plotly !== 'undefined') {
+            const [_, id, dataStr, layoutStr, configStr] = newPlotMatch;
+            
+            // Parsear datos
+            const data = JSON.parse(dataStr);
+            const layout = JSON.parse(layoutStr);
+            const config = JSON.parse(configStr);
+            
+            // Limpiar contenedor y recrear
+            container.innerHTML = `<div id="${id}"></div>`;
+            Plotly.newPlot(id, data, layout, config);
+            
+            console.log('✅ Gráfico recreado manualmente desde datos');
+        }
+    } catch (error) {
+        console.log('❌ Error recreando gráfico:', error);
+    }
+}

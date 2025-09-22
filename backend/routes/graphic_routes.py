@@ -12,7 +12,6 @@ graphic_bp = Blueprint('graphic', __name__)
 
 @graphic_bp.route('/solve/interactive', methods=['POST'])
 def solve_interactive():
-    """Endpoint para solución con gráfico interactivo Plotly"""
     try:
         data = request.get_json()
         
@@ -26,39 +25,30 @@ def solve_interactive():
         if 'constraints' not in data or not data['constraints'] or len(data['constraints']) == 0:
             return jsonify({"error": "Faltan restricciones"}), 400
         
+        if 'optimization_type' not in data:
+            return jsonify({"error": "Falta el tipo de optimización (maximize/minimize)"}), 400
+        
         if len(data['constraints']) < 2:
             return jsonify({"error": "Se necesitan al menos 2 restricciones"}), 400
         
-        # Importar aquí para evitar problemas de importación circular
-        print("🔄 Intentando importar Plotly...")
-        try:
-            from utils.plotly_graphics import InteractiveLinearProgramming
-            print("✅ Plotly importado correctamente")
-        except ImportError as e:
-            print(f"❌ Error importando Plotly: {e}")
-            import traceback
-            traceback.print_exc()
-            return jsonify({"error": f"Error con gráfico interactivo: {str(e)}"}), 500
-        
-        # Resolver con Plotly
-        print("🔧 Creando problema interactivo...")
+        # Importar y resolver
+        from utils.plotly_graphics import InteractiveLinearProgramming
         problem = InteractiveLinearProgramming(data['objective'], data['constraints'])
-        result = problem.solve_interactive()
         
-        print(f"✅ Solución interactiva generada: {result.get('interactive_plot') is not None}")
+        # Pasar el tipo de optimización al solve
+        result = problem.solve_interactive(optimization_type=data['optimization_type'])
+        
         return jsonify(result)
         
     except Exception as e:
-        print(f"❌ Error en /solve/interactive: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error en /solve/interactive: {str(e)}")
         return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
 
 @graphic_bp.route('/solve/static', methods=['POST'])
 def solve_static():
-    """Endpoint para solución con gráfico estático PNG"""
     try:
         data = request.get_json()
+        print(f"📦 Datos recibidos en /static: {data}")  # ← LOG PARA DEBUG
         
         # Validaciones
         if not data:
@@ -70,18 +60,22 @@ def solve_static():
         if 'constraints' not in data or not data['constraints'] or len(data['constraints']) == 0:
             return jsonify({"error": "Faltan restricciones"}), 400
         
+        if 'optimization_type' not in data:
+            return jsonify({"error": "Falta el tipo de optimización"}), 400
+        
         if len(data['constraints']) < 2:
             return jsonify({"error": "Se necesitan al menos 2 restricciones"}), 400
         
-        # Resolver con Matplotlib
+        # Resolver
         problem = LinearProgrammingProblem(data['objective'], data['constraints'])
-        result = problem.solve_with_plot()
+        result = problem.solve_with_plot(optimization_type=data['optimization_type'])
         
+        print(f"✅ Resultado estático: {result.get('plot') is not None}")  # ← LOG
         return jsonify(result)
         
     except Exception as e:
-        print(f"Error en /solve/static: {str(e)}")
-        return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
+        print(f"❌ Error en /solve/static: {str(e)}")
+        return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
 @graphic_bp.route('/health', methods=['GET'])
 def health_check():

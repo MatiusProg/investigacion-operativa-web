@@ -3,15 +3,59 @@ const API_URL = 'http://localhost:5000/api/graphic';
 // Estado de la aplicación
 let currentSolution = null;
 let currentTab = 'interactive';
+let optimizationType = 'maximize';
+
+// Función para cambiar tipo de optimización
+function cambiarTipoOptimizacion(tipo) {
+    optimizationType = tipo;
+    
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.querySelector(`.opt-btn[data-type="${tipo}"]`).classList.add('active');
+    console.log('Tipo de optimización:', optimizationType);
+}
+
+// Función para obtener restricciones
+function obtenerRestricciones() {
+    return Array.from(document.querySelectorAll('#restricciones input'))
+        .map(input => input.value.trim())
+        .filter(r => r !== '');
+}
+
+// Función para eliminar restricción
+function eliminarRestriccion(boton) {
+    const restrictionItem = boton.closest('.restriction-item');
+    if (restrictionItem) {
+        restrictionItem.remove();
+    }
+    
+    const restricciones = document.querySelectorAll('#restricciones .restriction-item');
+    if (restricciones.length === 0) {
+        añadirRestriccion();
+    }
+}
+
+// Función para añadir restricción
+function añadirRestriccion() {
+    const restriccionesDiv = document.getElementById('restricciones');
+    const newItem = document.createElement('div');
+    newItem.className = 'restriction-item';
+    newItem.innerHTML = `
+        <input type="text" placeholder="Ej: 2x + y <= 100">
+        <button class="btn-remove-restriction" onclick="eliminarRestriccion(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    restriccionesDiv.appendChild(newItem);
+}
 
 // Función principal para resolver
 async function resolverProblema() {
-    const funcionObjetivo = document.querySelector('input[placeholder="Max Z = 3x + 2y"]').value;
-    const restricciones = Array.from(document.querySelectorAll('#restricciones input'))
-        .map(input => input.value.trim())
-        .filter(r => r !== '');
+    const funcionObjetivo = document.getElementById('funcionObjetivo').value;
+    const restricciones = obtenerRestricciones();
 
-    // Validar
     if (!funcionObjetivo) {
         alert('Por favor, ingrese la función objetivo');
         return;
@@ -23,7 +67,6 @@ async function resolverProblema() {
     }
 
     try {
-        // Mostrar loading
         document.getElementById('solucion').innerHTML = `
             <div class="loading-container">
                 <h3>Solución Óptima</h3>
@@ -32,14 +75,18 @@ async function resolverProblema() {
             </div>
         `;
 
-        // Llamar a la API interactiva
         const response = await fetch(`${API_URL}/solve/interactive`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ objective: funcionObjetivo, constraints: restricciones })
+            body: JSON.stringify({ 
+                objective: funcionObjetivo, 
+                constraints: restricciones,
+                optimization_type: optimizationType
+            })
         });
 
         const data = await response.json();
+        console.log('📊 Datos recibidos:', data);
 
         if (data.error) {
             alert('Error: ' + data.error);
@@ -54,12 +101,11 @@ async function resolverProblema() {
     }
 }
 
-// Función para mostrar resultados (SIMPIFICADA)
-// Función alternativa para mostrar resultados
+// Función para mostrar resultados
 function mostrarResultados(data, tab) {
     currentTab = tab;
     
-    let html = `
+    let solucionHTML = `
         <div class="results-header">
             <h3>Solución Óptima</h3>
             <div class="tab-buttons">
@@ -71,96 +117,174 @@ function mostrarResultados(data, tab) {
                 </button>
             </div>
         </div>
-        
-        <div class="results-content">
-            <div class="numeric-results">
-                <p><strong>Punto óptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
-                <p><strong>Valor óptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
-                <p><strong>Vértices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
-            </div>
+        <div class="numeric-results">
+            <p><strong>Punto óptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
+            <p><strong>Valor óptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
+            <p><strong>Vértices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
+        </div>
     `;
 
-    if (tab === 'interactive') {
-        // MOSTRAR PRIMERO LA VERSIÓN ESTÁTICA como placeholder
-        html += `
+    let graficoHTML = '';
+    
+    if (tab === 'interactive' && data.interactive_plot) {
+        graficoHTML = `
             <div class="plot-container">
-                <h4>Gráfico Interactivo <small>(cargando...)</small></h4>
-                ${data.plot ? `<img src="data:image/png;base64,${data.plot}" alt="Gráfico de carga" class="export-image" style="opacity:0.7;">` : ''}
-                <div id="plotly-container" style="min-height:500px; display:none;">
-                    ${data.interactive_plot || ''}
-                </div>
+                <h4>Gráfico Interactivo</h4>
+                <div id="plotly-container">${data.interactive_plot}</div>
             </div>
         `;
     } else if (tab === 'static' && data.plot) {
-        html += `
+        graficoHTML = `
             <div class="plot-container">
                 <h4>Gráfico para Exportar</h4>
                 <img src="data:image/png;base64,${data.plot}" alt="Gráfico" class="export-image">
-                <button class="btn-export" onclick="exportarPNG()">
-                    💾 Descargar PNG
-                </button>
+                <button class="btn-export" onclick="exportarPNG()">💾 Descargar PNG</button>
             </div>
         `;
+    } else {
+        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualización</p>`;
     }
 
-    html += `</div>`;
-    document.getElementById('solucion').innerHTML = html;
+    document.getElementById('solucion').innerHTML = solucionHTML;
+    document.getElementById('grafico-interactivo').innerHTML = graficoHTML;
 
-    // Cargar Plotly en segundo plano
     if (tab === 'interactive' && data.interactive_plot) {
-        setTimeout(() => {
-            const container = document.getElementById('plotly-container');
-            if (container) {
-                container.style.display = 'block';
-                ejecutarScriptsPlotly();
-            }
-        }, 500);
+        setTimeout(initializePlotlyInteractive, 300);
     }
 }
 
-// Función SUPER SIMPLE para ejecutar scripts de Plotly
+// Función para inicializar Plotly
+// Función para inicializar Plotly
+function initializePlotlyInteractive() {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    console.log('✅ Inicializando gráfico interactivo...');
+    
+    // Esperar a que Plotly esté disponible
+    const checkPlotlyLoaded = setInterval(() => {
+        if (typeof Plotly !== 'undefined') {
+            clearInterval(checkPlotlyLoaded);
+            console.log('🎯 Plotly cargado, ejecutando scripts...');
+            ejecutarScriptsPlotly();
+            
+            // Verificar después de un tiempo si se renderizó
+            setTimeout(() => {
+                const plotlyDiv = container.querySelector('.plotly-graph-div');
+                if (!plotlyDiv || plotlyDiv.children.length === 0) {
+                    console.log('⚠️  Gráfico no renderizado, intentando recrear...');
+                    recrearPlotlyDesdeDatos();
+                } else {
+                    console.log('✅ Gráfico interactivo mostrado correctamente');
+                }
+            }, 1000);
+        }
+    }, 100);
+    
+    // Timeout de seguridad
+    setTimeout(() => {
+        clearInterval(checkPlotlyLoaded);
+        if (typeof Plotly === 'undefined') {
+            console.log('⏰ Timeout: Cargando Plotly manualmente...');
+            cargarPlotlyManualmente();
+        }
+    }, 5000);
+}
+
+// Función para ejecutar scripts
+// Función para ejecutar scripts de Plotly
 function ejecutarScriptsPlotly() {
     const scripts = document.querySelectorAll('#plotly-container script');
+    console.log(`📜 Encontrados ${scripts.length} scripts`);
     
-    scripts.forEach(script => {
-        const newScript = document.createElement('script');
-        
-        if (script.src) {
-            // Script externo (Plotly CDN)
-            newScript.src = script.src;
-            newScript.async = true;
-        } else {
-            // Script inline (datos del gráfico)
-            newScript.textContent = script.textContent;
+    // Verificar si Plotly está cargado primero
+    if (typeof Plotly === 'undefined') {
+        console.log('⏳ Plotly no está cargado, esperando...');
+        setTimeout(ejecutarScriptsPlotly, 100);
+        return;
+    }
+    
+    scripts.forEach((script, index) => {
+        try {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+                newScript.async = true;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.head.appendChild(newScript);
+            console.log(`✅ Script ${index + 1} ejecutado`);
+        } catch (error) {
+            console.log(`❌ Error en script ${index + 1}:`, error);
         }
-        
-        document.head.appendChild(newScript);
     });
-    
-    console.log('✅ Scripts de Plotly ejecutados');
 }
 
-// Función para cambiar entre pestañas
+// Método manual alternativo
+function initializePlotlyManual(plotlyHtml) {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = plotlyHtml;
+    
+    const plotlyDiv = tempDiv.querySelector('.plotly-graph-div');
+    const scripts = tempDiv.querySelectorAll('script');
+    
+    if (plotlyDiv) {
+        container.innerHTML = '';
+        container.appendChild(plotlyDiv.cloneNode(true));
+        
+        scripts.forEach(script => {
+            if (script.textContent.includes('Plotly.newPlot')) {
+                try {
+                    eval(script.textContent);
+                } catch (error) {
+                    console.log('Error ejecutando script manual:', error);
+                }
+            }
+        });
+    }
+}
+
+// Función para cambiar pestañas
 async function cambiarPestaña(tab) {
     if (!currentSolution) return;
     
-    if (tab === 'static' && !currentSolution.plot) {
+    document.getElementById('grafico-interactivo').innerHTML = `
+        <div class="plotly-loading">
+            <div class="plotly-spinner"></div>
+            <p>Cargando ${tab === 'interactive' ? 'interactivo' : 'exportar'}...</p>
+        </div>
+    `;
+    
+    if (tab === 'static') {
         try {
-            const funcionObjetivo = document.querySelector('input[placeholder="Max Z = 3x + 2y"]').value;
-            const restricciones = Array.from(document.querySelectorAll('#restricciones input'))
-                .map(input => input.value.trim())
-                .filter(r => r !== '');
-            
-            const response = await fetch(`${API_URL}/solve/static`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ objective: funcionObjetivo, constraints: restricciones })
-            });
-            
-            const staticData = await response.json();
-            currentSolution.plot = staticData.plot;
+            if (!currentSolution.plot) {
+                const response = await fetch(`${API_URL}/solve/static`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        objective: document.getElementById('funcionObjetivo').value, 
+                        constraints: obtenerRestricciones(),
+                        optimization_type: optimizationType
+                    })
+                });
+                
+                const staticData = await response.json();
+                if (staticData.error) throw new Error(staticData.error);
+                
+                currentSolution.plot = staticData.plot;
+            }
         } catch (error) {
-            console.error('Error obteniendo gráfico estático:', error);
+            document.getElementById('grafico-interactivo').innerHTML = `
+                <div class="error-container">
+                    <p>Error: ${error.message}</p>
+                    <button class="btn-retry" onclick="cambiarPestaña('static')">Reintentar</button>
+                </div>
+            `;
+            return;
         }
     }
     
@@ -169,8 +293,8 @@ async function cambiarPestaña(tab) {
 
 // Función para exportar PNG
 function exportarPNG() {
-    if (!currentSolution || !currentSolution.plot) {
-        alert('No hay gráfico disponible para exportar');
+    if (!currentSolution?.plot) {
+        alert('No hay gráfico para exportar');
         return;
     }
 
@@ -180,20 +304,24 @@ function exportarPNG() {
     link.click();
 }
 
-// Función para añadir restricciones
-function añadirRestriccion() {
-    const restriccionesDiv = document.getElementById('restricciones');
-    const newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.placeholder = 'Ej: 2x + 3y <= 100';
-    newInput.className = 'restriction-input';
-    restriccionesDiv.appendChild(newInput);
-}
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    // Conectar botones
+    // Botones de optimización
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            cambiarTipoOptimizacion(this.dataset.type);
+        });
+    });
+    
+    // Cerrar menú
+    document.getElementById('closeMenu').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.remove('active');
+    });
+    
+    // Botón resolver
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
+    
+    // Añadir restricción
     document.getElementById('addRestriccion').addEventListener('click', function(e) {
         e.preventDefault();
         añadirRestriccion();
