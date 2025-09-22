@@ -8,18 +8,18 @@ const getApiUrl = () => {
     }
     
     // Producci®Æn - GitHub Pages
-    return 'https://programacion-lineal-backend.onrender.com';
+    return 'https://programacion-lineal-backend.onrender.com/api/graphic';
 };
 
 const API_URL = getApiUrl();
-console.log('La URL de API configurada:', API_URL);
+console.log('URL de API configurada:', API_URL);
 
 // Estado de la aplicaci®Æn
 let currentSolution = null;
 let currentTab = 'interactive';
 let optimizationType = 'maximize';
 
-// Funci®Æn para cambiar tipo de optimizaci√≥n
+// Funci®Æn para cambiar tipo de optimizaci®Æn
 function cambiarTipoOptimizacion(tipo) {
     optimizationType = tipo;
     
@@ -47,12 +47,12 @@ function eliminarRestriccion(boton) {
     
     const restricciones = document.querySelectorAll('#restricciones .restriction-item');
     if (restricciones.length === 0) {
-        a√±adirRestriccion();
+        a?adirRestriccion();
     }
 }
 
-// Funci®Æn para a?adir restricci√≥n
-function a√±adirRestriccion() {
+// Funci®Æn para a?adir restricci®Æn
+function a?adirRestriccion() {
     const restriccionesDiv = document.getElementById('restricciones');
     const newItem = document.createElement('div');
     newItem.className = 'restriction-item';
@@ -71,7 +71,7 @@ async function resolverProblema() {
     const restricciones = obtenerRestricciones();
 
     if (!funcionObjetivo) {
-        alert('Por favor, ingrese la funci√≥n objetivo');
+        alert('Por favor, ingrese la funci®Æn objetivo');
         return;
     }
 
@@ -104,7 +104,7 @@ async function resolverProblema() {
         }
 
         const data = await response.json();
-        console.log('üìä Datos recibidos:', data);
+        console.log('Datos recibidos:', data);
 
         if (data.error) {
             alert('Error: ' + data.error);
@@ -115,7 +115,7 @@ async function resolverProblema() {
         mostrarResultados(data, 'interactive');
         
     } catch (error) {
-        console.error('‚ù?Error en resolverProblema:', error);
+        console.error('Error en resolverProblema:', error);
         alert('Error de conexi®Æn: ' + error.message);
     }
 }
@@ -129,17 +129,17 @@ function mostrarResultados(data, tab) {
             <h3>Soluci®Æn ®Æptima</h3>
             <div class="tab-buttons">
                 <button class="tab-btn ${tab === 'interactive' ? 'active' : ''}" onclick="cambiarPesta?a('interactive')">
-                    üìä Interactivo
+                    Interactivo
                 </button>
-                <button class="tab-btn ${tab === 'static' ? 'active' : ''}" onclick="cambiarPesta√±a('static')">
-                    üì∑ Exportar
+                <button class="tab-btn ${tab === 'static' ? 'active' : ''}" onclick="cambiarPesta?a('static')">
+                    Exportar
                 </button>
             </div>
         </div>
         <div class="numeric-results">
             <p><strong>Punto ®Æptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
             <p><strong>Valor ®Æptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
-            <p><strong>V√©rtices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
+            <p><strong>V®¶rtices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
         </div>
     `;
 
@@ -157,7 +157,7 @@ function mostrarResultados(data, tab) {
             <div class="plot-container">
                 <h4>Gr®¢fico para Exportar</h4>
                 <img src="data:image/png;base64,${data.plot}" alt="Gr®¢fico" class="export-image">
-                <button class="btn-export" onclick="exportarPNG()">üíæ Descargar PNG</button>
+                <button class="btn-export" onclick="exportarPNG()">Descargar PNG</button>
             </div>
         `;
     } else {
@@ -177,23 +177,23 @@ function initializePlotlyInteractive() {
     const container = document.getElementById('plotly-container');
     if (!container) return;
     
-    console.log('‚ú?Inicializando gr®¢fico interactivo...');
+    console.log('Inicializando gr®¢fico interactivo...');
     
-    // Esperar a que Plotly est®¢ disponible
+    // Esperar a que Plotly est®¶ disponible
     const checkPlotlyLoaded = setInterval(() => {
         if (typeof Plotly !== 'undefined') {
             clearInterval(checkPlotlyLoaded);
-            console.log('üéØ Plotly cargado, ejecutando scripts...');
+            console.log('Plotly cargado, ejecutando scripts...');
             ejecutarScriptsPlotly();
             
-            // Verificar despu®¶s de un tiempo si se renderiza
+            // Verificar despu®¶s de un tiempo si se renderiz®Æ
             setTimeout(() => {
                 const plotlyDiv = container.querySelector('.plotly-graph-div');
                 if (!plotlyDiv || plotlyDiv.children.length === 0) {
-                    console.log('‚ö†Ô∏è  Gr®¢fico no renderizado, intentando recrear...');
+                    console.log('Gr®¢fico no renderizado, intentando recrear...');
                     recrearPlotlyDesdeDatos();
                 } else {
-                    console.log('‚ú?Gr®¢fico interactivo mostrado correctamente');
+                    console.log('Gr®¢fico interactivo mostrado correctamente');
                 }
             }, 1000);
         }
@@ -203,7 +203,7 @@ function initializePlotlyInteractive() {
     setTimeout(() => {
         clearInterval(checkPlotlyLoaded);
         if (typeof Plotly === 'undefined') {
-            console.log('‚è?Timeout: Cargando Plotly manualmente...');
+            console.log('Timeout: Cargando Plotly manualmente...');
             cargarPlotlyManualmente();
         }
     }, 5000);
@@ -212,11 +212,11 @@ function initializePlotlyInteractive() {
 // Funci®Æn para ejecutar scripts de Plotly
 function ejecutarScriptsPlotly() {
     const scripts = document.querySelectorAll('#plotly-container script');
-    console.log(`üìú Encontrados ${scripts.length} scripts`);
+    console.log(`Encontrados ${scripts.length} scripts`);
     
     // Verificar si Plotly est®¢ cargado primero
     if (typeof Plotly === 'undefined') {
-        console.log('‚è?Plotly no est®¢ cargado, esperando...');
+        console.log('Plotly no est®¢ cargado, esperando...');
         setTimeout(ejecutarScriptsPlotly, 100);
         return;
     }
@@ -231,9 +231,9 @@ function ejecutarScriptsPlotly() {
                 newScript.textContent = script.textContent;
             }
             document.head.appendChild(newScript);
-            console.log(`‚ú?Script ${index + 1} ejecutado`);
+            console.log(`Script ${index + 1} ejecutado`);
         } catch (error) {
-            console.log(`‚ù?Error en script ${index + 1}:`, error);
+            console.log(`Error en script ${index + 1}:`, error);
         }
     });
 }
@@ -241,11 +241,11 @@ function ejecutarScriptsPlotly() {
 // Funci®Æn para cargar Plotly manualmente
 function cargarPlotlyManualmente() {
     if (typeof Plotly === 'undefined') {
-        console.log('üì¶ Cargando Plotly desde CDN...');
+        console.log('Cargando Plotly desde CDN...');
         const script = document.createElement('script');
         script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
         script.onload = function() {
-            console.log('‚ú?Plotly cargado manualmente');
+            console.log('Plotly cargado manualmente');
             ejecutarScriptsPlotly();
         };
         document.head.appendChild(script);
@@ -279,15 +279,15 @@ function recrearPlotlyDesdeDatos() {
             container.innerHTML = `<div id="${id}"></div>`;
             Plotly.newPlot(id, data, layout, config);
             
-            console.log('‚ú?Gr®¢fico recreado manualmente desde datos');
+            console.log('Gr®¢fico recreado manualmente desde datos');
         }
     } catch (error) {
-        console.log('‚ù?Error recreando gr®¢fico:', error);
+        console.log('Error recreando gr®¢fico:', error);
     }
 }
 
-// Funci®Æn para cambiar pesta√±as
-async function cambiarPesta√±a(tab) {
+// Funci®Æn para cambiar pesta?as
+async function cambiarPesta?a(tab) {
     if (!currentSolution) return;
     
     // Si vamos a interactivo y ya tenemos el gr®¢fico, solo mostrarlo
@@ -329,7 +329,7 @@ async function cambiarPesta√±a(tab) {
             document.getElementById('grafico-interactivo').innerHTML = `
                 <div class="error-container">
                     <p>Error: ${error.message}</p>
-                    <button class="btn-retry" onclick="cambiarPesta√±a('static')">Reintentar</button>
+                    <button class="btn-retry" onclick="cambiarPesta?a('static')">Reintentar</button>
                 </div>
             `;
             return;
@@ -342,7 +342,7 @@ async function cambiarPesta√±a(tab) {
 // Funci®Æn para exportar PNG
 function exportarPNG() {
     if (!currentSolution?.plot) {
-        alert('No hay gr√°fico para exportar');
+        alert('No hay gr®¢fico para exportar');
         return;
     }
 
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    console.log('‚ú?Aplicaci®Æn inicializada. API URL:', API_URL);
+    console.log('Aplicaci®Æn inicializada. API URL:', API_URL);
 });
 
 // Remover console.log en producci®Æn (solo mantener para desarrollo)
