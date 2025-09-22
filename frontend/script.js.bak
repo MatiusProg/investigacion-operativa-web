@@ -1,4 +1,4 @@
-// Configuraci√≥n de API URL para producci√≥n/desarrollo
+// Configuraci®Æn de API URL para producci®Æn/desarrollo
 const getApiUrl = () => {
     const hostname = window.location.hostname;
     
@@ -7,19 +7,19 @@ const getApiUrl = () => {
         return 'http://localhost:5000/api/graphic';
     }
     
-    // Producci√≥n - GitHub Pages
-    return 'https://programacion-lineal-backend.onrender.com/api/graphic';
+    // Producci®Æn - GitHub Pages
+    return 'https://programacion-lineal-backend.onrender.com';
 };
 
 const API_URL = getApiUrl();
-console.log('üåê URL de API configurada:', API_URL);
+console.log('La URL de API configurada:', API_URL);
 
-// Estado de la aplicaci√≥n
+// Estado de la aplicaci®Æn
 let currentSolution = null;
 let currentTab = 'interactive';
 let optimizationType = 'maximize';
 
-// Funci√≥n para cambiar tipo de optimizaci√≥n
+// Funci®Æn para cambiar tipo de optimizaci√≥n
 function cambiarTipoOptimizacion(tipo) {
     optimizationType = tipo;
     
@@ -28,17 +28,17 @@ function cambiarTipoOptimizacion(tipo) {
     });
     
     document.querySelector(`.opt-btn[data-type="${tipo}"]`).classList.add('active');
-    console.log('Tipo de optimizaci√≥n:', optimizationType);
+    console.log('Tipo de optimizaci®Æn:', optimizationType);
 }
 
-// Funci√≥n para obtener restricciones
+// Funci®Æn para obtener restricciones
 function obtenerRestricciones() {
     return Array.from(document.querySelectorAll('#restricciones input'))
         .map(input => input.value.trim())
         .filter(r => r !== '');
 }
 
-// Funci√≥n para eliminar restricci√≥n
+// Funci®Æn para eliminar restricci®Æn
 function eliminarRestriccion(boton) {
     const restrictionItem = boton.closest('.restriction-item');
     if (restrictionItem) {
@@ -51,7 +51,7 @@ function eliminarRestriccion(boton) {
     }
 }
 
-// Funci√≥n para a√±adir restricci√≥n
+// Funci®Æn para a?adir restricci√≥n
 function a√±adirRestriccion() {
     const restriccionesDiv = document.getElementById('restricciones');
     const newItem = document.createElement('div');
@@ -65,7 +65,7 @@ function a√±adirRestriccion() {
     restriccionesDiv.appendChild(newItem);
 }
 
-// Funci√≥n principal para resolver
+// Funci®Æn principal para resolver
 async function resolverProblema() {
     const funcionObjetivo = document.getElementById('funcionObjetivo').value;
     const restricciones = obtenerRestricciones();
@@ -83,9 +83,9 @@ async function resolverProblema() {
     try {
         document.getElementById('solucion').innerHTML = `
             <div class="loading-container">
-                <h3>Soluci√≥n √ìptima</h3>
+                <h3>Soluci®Æn ®Æptima</h3>
                 <div class="loading-spinner"></div>
-                <p>Calculando soluci√≥n...</p>
+                <p>Calculando soluci®Æn...</p>
             </div>
         `;
 
@@ -115,20 +115,20 @@ async function resolverProblema() {
         mostrarResultados(data, 'interactive');
         
     } catch (error) {
-        console.error('‚ùå Error en resolverProblema:', error);
-        alert('Error de conexi√≥n: ' + error.message);
+        console.error('‚ù?Error en resolverProblema:', error);
+        alert('Error de conexi®Æn: ' + error.message);
     }
 }
 
-// Funci√≥n para mostrar resultados
+// Funci®Æn para mostrar resultados
 function mostrarResultados(data, tab) {
     currentTab = tab;
     
     let solucionHTML = `
         <div class="results-header">
-            <h3>Soluci√≥n √ìptima</h3>
+            <h3>Soluci®Æn ®Æptima</h3>
             <div class="tab-buttons">
-                <button class="tab-btn ${tab === 'interactive' ? 'active' : ''}" onclick="cambiarPesta√±a('interactive')">
+                <button class="tab-btn ${tab === 'interactive' ? 'active' : ''}" onclick="cambiarPesta?a('interactive')">
                     üìä Interactivo
                 </button>
                 <button class="tab-btn ${tab === 'static' ? 'active' : ''}" onclick="cambiarPesta√±a('static')">
@@ -137,8 +137,8 @@ function mostrarResultados(data, tab) {
             </div>
         </div>
         <div class="numeric-results">
-            <p><strong>Punto √≥ptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
-            <p><strong>Valor √≥ptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
+            <p><strong>Punto ®Æptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
+            <p><strong>Valor ®Æptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
             <p><strong>V√©rtices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
         </div>
     `;
@@ -148,20 +148,20 @@ function mostrarResultados(data, tab) {
     if (tab === 'interactive' && data.interactive_plot) {
         graficoHTML = `
             <div class="plot-container">
-                <h4>Gr√°fico Interactivo</h4>
+                <h4>Gr®¢fico Interactivo</h4>
                 <div id="plotly-container">${data.interactive_plot}</div>
             </div>
         `;
     } else if (tab === 'static' && data.plot) {
         graficoHTML = `
             <div class="plot-container">
-                <h4>Gr√°fico para Exportar</h4>
-                <img src="data:image/png;base64,${data.plot}" alt="Gr√°fico" class="export-image">
+                <h4>Gr®¢fico para Exportar</h4>
+                <img src="data:image/png;base64,${data.plot}" alt="Gr®¢fico" class="export-image">
                 <button class="btn-export" onclick="exportarPNG()">üíæ Descargar PNG</button>
             </div>
         `;
     } else {
-        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualizaci√≥n</p>`;
+        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualizaci®Æn</p>`;
     }
 
     document.getElementById('solucion').innerHTML = solucionHTML;
@@ -172,28 +172,28 @@ function mostrarResultados(data, tab) {
     }
 }
 
-// Funci√≥n para inicializar Plotly
+// Funci®Æn para inicializar Plotly
 function initializePlotlyInteractive() {
     const container = document.getElementById('plotly-container');
     if (!container) return;
     
-    console.log('‚úÖ Inicializando gr√°fico interactivo...');
+    console.log('‚ú?Inicializando gr®¢fico interactivo...');
     
-    // Esperar a que Plotly est√© disponible
+    // Esperar a que Plotly est®¢ disponible
     const checkPlotlyLoaded = setInterval(() => {
         if (typeof Plotly !== 'undefined') {
             clearInterval(checkPlotlyLoaded);
             console.log('üéØ Plotly cargado, ejecutando scripts...');
             ejecutarScriptsPlotly();
             
-            // Verificar despu√©s de un tiempo si se renderiz√≥
+            // Verificar despu®¶s de un tiempo si se renderiza
             setTimeout(() => {
                 const plotlyDiv = container.querySelector('.plotly-graph-div');
                 if (!plotlyDiv || plotlyDiv.children.length === 0) {
-                    console.log('‚ö†Ô∏è  Gr√°fico no renderizado, intentando recrear...');
+                    console.log('‚ö†Ô∏è  Gr®¢fico no renderizado, intentando recrear...');
                     recrearPlotlyDesdeDatos();
                 } else {
-                    console.log('‚úÖ Gr√°fico interactivo mostrado correctamente');
+                    console.log('‚ú?Gr®¢fico interactivo mostrado correctamente');
                 }
             }, 1000);
         }
@@ -203,20 +203,20 @@ function initializePlotlyInteractive() {
     setTimeout(() => {
         clearInterval(checkPlotlyLoaded);
         if (typeof Plotly === 'undefined') {
-            console.log('‚è∞ Timeout: Cargando Plotly manualmente...');
+            console.log('‚è?Timeout: Cargando Plotly manualmente...');
             cargarPlotlyManualmente();
         }
     }, 5000);
 }
 
-// Funci√≥n para ejecutar scripts de Plotly
+// Funci®Æn para ejecutar scripts de Plotly
 function ejecutarScriptsPlotly() {
     const scripts = document.querySelectorAll('#plotly-container script');
     console.log(`üìú Encontrados ${scripts.length} scripts`);
     
-    // Verificar si Plotly est√° cargado primero
+    // Verificar si Plotly est®¢ cargado primero
     if (typeof Plotly === 'undefined') {
-        console.log('‚è≥ Plotly no est√° cargado, esperando...');
+        console.log('‚è?Plotly no est®¢ cargado, esperando...');
         setTimeout(ejecutarScriptsPlotly, 100);
         return;
     }
@@ -231,21 +231,21 @@ function ejecutarScriptsPlotly() {
                 newScript.textContent = script.textContent;
             }
             document.head.appendChild(newScript);
-            console.log(`‚úÖ Script ${index + 1} ejecutado`);
+            console.log(`‚ú?Script ${index + 1} ejecutado`);
         } catch (error) {
-            console.log(`‚ùå Error en script ${index + 1}:`, error);
+            console.log(`‚ù?Error en script ${index + 1}:`, error);
         }
     });
 }
 
-// Funci√≥n para cargar Plotly manualmente
+// Funci®Æn para cargar Plotly manualmente
 function cargarPlotlyManualmente() {
     if (typeof Plotly === 'undefined') {
         console.log('üì¶ Cargando Plotly desde CDN...');
         const script = document.createElement('script');
         script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
         script.onload = function() {
-            console.log('‚úÖ Plotly cargado manualmente');
+            console.log('‚ú?Plotly cargado manualmente');
             ejecutarScriptsPlotly();
         };
         document.head.appendChild(script);
@@ -254,7 +254,7 @@ function cargarPlotlyManualmente() {
     }
 }
 
-// Funci√≥n para recrear Plotly desde los datos
+// Funci®Æn para recrear Plotly desde los datos
 function recrearPlotlyDesdeDatos() {
     const container = document.getElementById('plotly-container');
     if (!container) return;
@@ -279,18 +279,18 @@ function recrearPlotlyDesdeDatos() {
             container.innerHTML = `<div id="${id}"></div>`;
             Plotly.newPlot(id, data, layout, config);
             
-            console.log('‚úÖ Gr√°fico recreado manualmente desde datos');
+            console.log('‚ú?Gr®¢fico recreado manualmente desde datos');
         }
     } catch (error) {
-        console.log('‚ùå Error recreando gr√°fico:', error);
+        console.log('‚ù?Error recreando gr®¢fico:', error);
     }
 }
 
-// Funci√≥n para cambiar pesta√±as
+// Funci®Æn para cambiar pesta√±as
 async function cambiarPesta√±a(tab) {
     if (!currentSolution) return;
     
-    // Si vamos a interactivo y ya tenemos el gr√°fico, solo mostrarlo
+    // Si vamos a interactivo y ya tenemos el gr®¢fico, solo mostrarlo
     if (tab === 'interactive' && currentSolution.interactive_plot) {
         mostrarResultados(currentSolution, tab);
         return;
@@ -339,7 +339,7 @@ async function cambiarPesta√±a(tab) {
     mostrarResultados(currentSolution, tab);
 }
 
-// Funci√≥n para exportar PNG
+// Funci®Æn para exportar PNG
 function exportarPNG() {
     if (!currentSolution?.plot) {
         alert('No hay gr√°fico para exportar');
@@ -352,36 +352,36 @@ function exportarPNG() {
     link.click();
 }
 
-// Inicializaci√≥n
+// Inicializaci®Æn
 document.addEventListener('DOMContentLoaded', function() {
-    // Botones de optimizaci√≥n
+    // Botones de optimizaci®Æn
     document.querySelectorAll('.opt-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             cambiarTipoOptimizacion(this.dataset.type);
         });
     });
     
-    // Cerrar men√∫
+    // Cerrar men®≤
     document.getElementById('closeMenu').addEventListener('click', function() {
         document.querySelector('.sidebar').classList.remove('active');
     });
     
-    // Bot√≥n resolver
+    // Bot®Æn resolver
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
     
-    // A√±adir restricci√≥n
+    // A?adir restricci®Æn
     const addButton = document.getElementById('addRestriccion');
     if (addButton) {
         addButton.addEventListener('click', function(e) {
             e.preventDefault();
-            a√±adirRestriccion();
+            a?adirRestriccion();
         });
     }
     
-    console.log('‚úÖ Aplicaci√≥n inicializada. API URL:', API_URL);
+    console.log('‚ú?Aplicaci®Æn inicializada. API URL:', API_URL);
 });
 
-// Remover console.log en producci√≥n (solo mantener para desarrollo)
+// Remover console.log en producci®Æn (solo mantener para desarrollo)
 if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    console.log = function() {}; // Silenciar console.log en producci√≥n
+    console.log = function() {}; // Silenciar console.log en producci®Æn
 }
