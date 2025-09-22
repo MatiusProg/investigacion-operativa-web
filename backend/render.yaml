@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: investigacion-operativa-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: gunicorn wsgi:app --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /api/graphic/health
