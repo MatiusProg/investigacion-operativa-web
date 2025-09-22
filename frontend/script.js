@@ -1,4 +1,4 @@
-// Configuraci車n de API URL para producci車n/desarrollo
+// Configuracion de API URL para produccion/desarrollo
 const getApiUrl = () => {
     const hostname = window.location.hostname;
     
@@ -7,19 +7,19 @@ const getApiUrl = () => {
         return 'http://localhost:5000/api/graphic';
     }
     
-    // Producci車n - GitHub Pages
+    // Produccion - GitHub Pages
     return 'https://programacion-lineal-backend.onrender.com/api/graphic';
 };
 
 const API_URL = getApiUrl();
 console.log('URL de API configurada:', API_URL);
 
-// Estado de la aplicaci車n
+// Estado de la aplicacion
 let currentSolution = null;
 let currentTab = 'interactive';
 let optimizationType = 'maximize';
 
-// Funci車n para cambiar tipo de optimizaci車n
+// Funcion para cambiar tipo de optimizacion
 function cambiarTipoOptimizacion(tipo) {
     optimizationType = tipo;
     
@@ -28,17 +28,17 @@ function cambiarTipoOptimizacion(tipo) {
     });
     
     document.querySelector(`.opt-btn[data-type="${tipo}"]`).classList.add('active');
-    console.log('Tipo de optimizaci車n:', optimizationType);
+    console.log('Tipo de optimizacion:', optimizationType);
 }
 
-// Funci車n para obtener restricciones
+// Funcion para obtener restricciones
 function obtenerRestricciones() {
     return Array.from(document.querySelectorAll('#restricciones input'))
         .map(input => input.value.trim())
         .filter(r => r !== '');
 }
 
-// Funci車n para eliminar restricci車n
+// Funcion para eliminar restriccion
 function eliminarRestriccion(boton) {
     const restrictionItem = boton.closest('.restriction-item');
     if (restrictionItem) {
@@ -47,12 +47,12 @@ function eliminarRestriccion(boton) {
     
     const restricciones = document.querySelectorAll('#restricciones .restriction-item');
     if (restricciones.length === 0) {
-        a?adirRestriccion();
+        a簽adirRestriccion();
     }
 }
 
-// Funci車n para a?adir restricci車n
-function a?adirRestriccion() {
+// Funcion para a簽adir restriccion
+function a簽adirRestriccion() {
     const restriccionesDiv = document.getElementById('restricciones');
     const newItem = document.createElement('div');
     newItem.className = 'restriction-item';
@@ -65,13 +65,13 @@ function a?adirRestriccion() {
     restriccionesDiv.appendChild(newItem);
 }
 
-// Funci車n principal para resolver
+// Funcion principal para resolver
 async function resolverProblema() {
     const funcionObjetivo = document.getElementById('funcionObjetivo').value;
     const restricciones = obtenerRestricciones();
 
     if (!funcionObjetivo) {
-        alert('Por favor, ingrese la funci車n objetivo');
+        alert('Por favor, ingrese la funcion objetivo');
         return;
     }
 
@@ -83,9 +83,9 @@ async function resolverProblema() {
     try {
         document.getElementById('solucion').innerHTML = `
             <div class="loading-container">
-                <h3>Soluci車n 車ptima</h3>
+                <h3>Solucion Optima</h3>
                 <div class="loading-spinner"></div>
-                <p>Calculando soluci車n...</p>
+                <p>Calculando solucion...</p>
             </div>
         `;
 
@@ -116,30 +116,30 @@ async function resolverProblema() {
         
     } catch (error) {
         console.error('Error en resolverProblema:', error);
-        alert('Error de conexi車n: ' + error.message);
+        alert('Error de conexion: ' + error.message);
     }
 }
 
-// Funci車n para mostrar resultados
+// Funcion para mostrar resultados
 function mostrarResultados(data, tab) {
     currentTab = tab;
     
     let solucionHTML = `
         <div class="results-header">
-            <h3>Soluci車n 車ptima</h3>
+            <h3>Solucion Optima</h3>
             <div class="tab-buttons">
-                <button class="tab-btn ${tab === 'interactive' ? 'active' : ''}" onclick="cambiarPesta?a('interactive')">
+                <button class="tab-btn ${tab === 'interactive' ? 'active' : ''}" onclick="cambiarPestana('interactive')">
                     Interactivo
                 </button>
-                <button class="tab-btn ${tab === 'static' ? 'active' : ''}" onclick="cambiarPesta?a('static')">
+                <button class="tab-btn ${tab === 'static' ? 'active' : ''}" onclick="cambiarPestana('static')">
                     Exportar
                 </button>
             </div>
         </div>
         <div class="numeric-results">
-            <p><strong>Punto 車ptimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
-            <p><strong>Valor 車ptimo:</strong> ${data.optimal_value.toFixed(2)}</p>
-            <p><strong>V谷rtices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
+            <p><strong>Punto optimo:</strong> (${data.optimal_point[0].toFixed(2)}, ${data.optimal_point[1].toFixed(2)})</p>
+            <p><strong>Valor optimo:</strong> ${data.optimal_value.toFixed(2)}</p>
+            <p><strong>Vertices factibles:</strong> ${data.feasible_vertices.length} puntos</p>
         </div>
     `;
 
@@ -148,20 +148,20 @@ function mostrarResultados(data, tab) {
     if (tab === 'interactive' && data.interactive_plot) {
         graficoHTML = `
             <div class="plot-container">
-                <h4>Gr芍fico Interactivo</h4>
+                <h4>Grafico Interactivo</h4>
                 <div id="plotly-container">${data.interactive_plot}</div>
             </div>
         `;
     } else if (tab === 'static' && data.plot) {
         graficoHTML = `
             <div class="plot-container">
-                <h4>Gr芍fico para Exportar</h4>
-                <img src="data:image/png;base64,${data.plot}" alt="Gr芍fico" class="export-image">
+                <h4>Grafico para Exportar</h4>
+                <img src="data:image/png;base64,${data.plot}" alt="Grafico" class="export-image">
                 <button class="btn-export" onclick="exportarPNG()">Descargar PNG</button>
             </div>
         `;
     } else {
-        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualizaci車n</p>`;
+        graficoHTML = `<p class="no-chart-message">Selecciona un modo de visualizacion</p>`;
     }
 
     document.getElementById('solucion').innerHTML = solucionHTML;
@@ -172,28 +172,28 @@ function mostrarResultados(data, tab) {
     }
 }
 
-// Funci車n para inicializar Plotly
+// Funcion para inicializar Plotly
 function initializePlotlyInteractive() {
     const container = document.getElementById('plotly-container');
     if (!container) return;
     
-    console.log('Inicializando gr芍fico interactivo...');
+    console.log('Inicializando grafico interactivo...');
     
-    // Esperar a que Plotly est谷 disponible
+    // Esperar a que Plotly este disponible
     const checkPlotlyLoaded = setInterval(() => {
         if (typeof Plotly !== 'undefined') {
             clearInterval(checkPlotlyLoaded);
             console.log('Plotly cargado, ejecutando scripts...');
             ejecutarScriptsPlotly();
             
-            // Verificar despu谷s de un tiempo si se renderiz車
+            // Verificar despu矇s de un tiempo si se renderizo
             setTimeout(() => {
                 const plotlyDiv = container.querySelector('.plotly-graph-div');
                 if (!plotlyDiv || plotlyDiv.children.length === 0) {
-                    console.log('Gr芍fico no renderizado, intentando recrear...');
+                    console.log('Grafico no renderizado, intentando recrear...');
                     recrearPlotlyDesdeDatos();
                 } else {
-                    console.log('Gr芍fico interactivo mostrado correctamente');
+                    console.log('Grafico interactivo mostrado correctamente');
                 }
             }, 1000);
         }
@@ -209,14 +209,14 @@ function initializePlotlyInteractive() {
     }, 5000);
 }
 
-// Funci車n para ejecutar scripts de Plotly
+// Funcion para ejecutar scripts de Plotly
 function ejecutarScriptsPlotly() {
     const scripts = document.querySelectorAll('#plotly-container script');
     console.log(`Encontrados ${scripts.length} scripts`);
     
-    // Verificar si Plotly est芍 cargado primero
+    // Verificar si Plotly esta cargado primero
     if (typeof Plotly === 'undefined') {
-        console.log('Plotly no est芍 cargado, esperando...');
+        console.log('Plotly no esta cargado, esperando...');
         setTimeout(ejecutarScriptsPlotly, 100);
         return;
     }
@@ -238,7 +238,7 @@ function ejecutarScriptsPlotly() {
     });
 }
 
-// Funci車n para cargar Plotly manualmente
+// Funcion para cargar Plotly manualmente
 function cargarPlotlyManualmente() {
     if (typeof Plotly === 'undefined') {
         console.log('Cargando Plotly desde CDN...');
@@ -254,7 +254,7 @@ function cargarPlotlyManualmente() {
     }
 }
 
-// Funci車n para recrear Plotly desde los datos
+// Funcion para recrear Plotly desde los datos
 function recrearPlotlyDesdeDatos() {
     const container = document.getElementById('plotly-container');
     if (!container) return;
@@ -279,18 +279,18 @@ function recrearPlotlyDesdeDatos() {
             container.innerHTML = `<div id="${id}"></div>`;
             Plotly.newPlot(id, data, layout, config);
             
-            console.log('Gr芍fico recreado manualmente desde datos');
+            console.log('Grafico recreado manualmente desde datos');
         }
     } catch (error) {
-        console.log('Error recreando gr芍fico:', error);
+        console.log('Error recreando grafico:', error);
     }
 }
 
-// Funci車n para cambiar pesta?as
-async function cambiarPesta?a(tab) {
+// Funcion para cambiar pestanas
+async function cambiarPestana(tab) {
     if (!currentSolution) return;
     
-    // Si vamos a interactivo y ya tenemos el gr芍fico, solo mostrarlo
+    // Si vamos a interactivo y ya tenemos el grafico, solo mostrarlo
     if (tab === 'interactive' && currentSolution.interactive_plot) {
         mostrarResultados(currentSolution, tab);
         return;
@@ -329,7 +329,7 @@ async function cambiarPesta?a(tab) {
             document.getElementById('grafico-interactivo').innerHTML = `
                 <div class="error-container">
                     <p>Error: ${error.message}</p>
-                    <button class="btn-retry" onclick="cambiarPesta?a('static')">Reintentar</button>
+                    <button class="btn-retry" onclick="cambiarPestana('static')">Reintentar</button>
                 </div>
             `;
             return;
@@ -339,10 +339,10 @@ async function cambiarPesta?a(tab) {
     mostrarResultados(currentSolution, tab);
 }
 
-// Funci車n para exportar PNG
+// Funcion para exportar PNG
 function exportarPNG() {
     if (!currentSolution?.plot) {
-        alert('No hay gr芍fico para exportar');
+        alert('No hay grafico para exportar');
         return;
     }
 
@@ -352,36 +352,36 @@ function exportarPNG() {
     link.click();
 }
 
-// Inicializaci車n
+// Inicializacion
 document.addEventListener('DOMContentLoaded', function() {
-    // Botones de optimizaci車n
+    // Botones de optimizacion
     document.querySelectorAll('.opt-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             cambiarTipoOptimizacion(this.dataset.type);
         });
     });
     
-    // Cerrar men迆
+    // Cerrar menu
     document.getElementById('closeMenu').addEventListener('click', function() {
         document.querySelector('.sidebar').classList.remove('active');
     });
     
-    // Bot車n resolver
+    // Boton resolver
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
     
-    // A?adir restricci車n
+    // A簽adir restriccion
     const addButton = document.getElementById('addRestriccion');
     if (addButton) {
         addButton.addEventListener('click', function(e) {
             e.preventDefault();
-            a?adirRestriccion();
+            a簽adirRestriccion();
         });
     }
     
-    console.log('Aplicaci車n inicializada. API URL:', API_URL);
+    console.log('Aplicacion inicializada. API URL:', API_URL);
 });
 
-// Remover console.log en producci車n (solo mantener para desarrollo)
+// Remover console.log en produccion (solo mantener para desarrollo)
 if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    console.log = function() {}; // Silenciar console.log en producci車n
+    console.log = function() {}; // Silenciar console.log en produccion
 }
