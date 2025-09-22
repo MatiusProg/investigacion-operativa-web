@@ -124,16 +124,26 @@ class LinearProgrammingProblem:
                 intersections.append((0, right_side / b))
         
         return intersections
-    def parse_objective(self, objective_str):
-        """Parsea la función objetivo de manera más robusta"""
+    def parse_objective(self, objective_str, optimization_type="maximize"):
+        """
+        Parsea la función objetivo con soporte para maximize/minimize como parámetro
+        y permite diferentes nombres de variables (x, y, x1, x2, etc.)
+        """
         # Limpiar y normalizar la cadena
-        clean_str = objective_str.lower().replace(" ", "").replace("maximize", "").replace("minimize", "").replace("max", "").replace("min", "")
+        clean_str = objective_str.lower().replace(" ", "").replace("maximize", "").replace("minimize", "")
         
-        # Determinar tipo de optimización
-        if "max" in objective_str.lower():
-            obj_type = "max"
-        else:
-            obj_type = "min"
+        # Determinar tipo de optimización desde parámetro
+        obj_type = optimization_type.lower()
+        
+        # Mapear variables (x, y, x1, x2, etc.) a x e y
+        variable_mapping = {
+            'x': 'x', 'x1': 'x', 'x_1': 'x', 'x1': 'x',
+            'y': 'y', 'x2': 'y', 'x_2': 'y', 'x2': 'y'
+        }
+        
+        # Reemplazar nombres de variables
+        for old_var, new_var in variable_mapping.items():
+            clean_str = clean_str.replace(old_var, new_var)
         
         # Usar expresión regular para encontrar coeficientes
         import re
@@ -165,7 +175,7 @@ class LinearProgrammingProblem:
         
         return obj_type, coef_x, coef_y
 
-    def solve(self):
+    def solve(self, optimization_type="maximize"):
         all_points = self.find_all_intersections()
         feasible_points = []
         
@@ -175,18 +185,19 @@ class LinearProgrammingProblem:
                 feasible_points.append(point)
         
         if not feasible_points:
-            return {"error": "No existe solucion factible"}
+            return {"error": "No existe solución factible"}
         
-        obj_type, obj_x, obj_y = self.parse_objective(self.objective)
+        # Usar el nuevo parsing con tipo de optimización
+        obj_type, obj_x, obj_y = self.parse_objective(self.objective, optimization_type)
         
-        best_value = float('-inf') if obj_type == "max" else float('inf')
+        best_value = float('-inf') if obj_type == "maximize" else float('inf')
         best_point = None
         
         for point in feasible_points:
             x, y = point
             value = obj_x * x + obj_y * y
             
-            if (obj_type == "max" and value > best_value) or (obj_type == "min" and value < best_value):
+            if (obj_type == "maximize" and value > best_value) or (obj_type == "minimize" and value < best_value):
                 best_value = value
                 best_point = point
         
@@ -197,6 +208,16 @@ class LinearProgrammingProblem:
         }
     def plot_solution(self, feasible_points, optimal_point):
         """Genera un gráfico completo y profesional de la solución"""
+        mapped_constraints = []
+        for constraint in self.constraints:
+            # Reemplazar x1, x_1, x2, x_2 por x, y
+            mapped_constraint = (constraint.replace('x1', 'x').replace('x_1', 'x')
+                                .replace('x2', 'y').replace('x_2', 'y'))
+            mapped_constraints.append(mapped_constraint)
+        
+        # Usar constraints mapeadas para el gráfico
+        original_constraints = self.constraints
+        self.constraints = mapped_constraints
         try:
             plt.figure(figsize=(12, 10))
             
@@ -308,9 +329,10 @@ class LinearProgrammingProblem:
             traceback.print_exc()
             return None
 
-    def solve_with_plot(self):
+    def solve_with_plot(self, optimization_type="maximize"):
         """Resuelve el problema y retorna resultado con gráfico"""
-        result = self.solve()
+        # Pasa el optimization_type al método solve
+        result = self.solve(optimization_type=optimization_type)
         
         if "error" in result:
             return result
