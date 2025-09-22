@@ -10,10 +10,13 @@
 
 <body>
 
-    <!-- Botón para mostrar/ocultar menú -->
-    <button id="menuToggle" class="menu-toggle">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- Header con botón de menú integrado -->
+    <header class="main-header">
+        <button id="menuToggle" class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1>INVESTIGACIÓN OPERATIVA</h1>
+    </header>
 
     <!-- Menú lateral -->
     <aside class="sidebar">
@@ -43,10 +46,6 @@
 
     <!-- Contenido principal -->
     <main class="content">
-        <header>
-            <h1>INVESTIGACIÓN OPERATIVA</h1>
-        </header>
-
         <!-- Sección principal -->
         <section class="card">
             <h2>Método Gráfico</h2>
@@ -81,7 +80,7 @@
                 </div>
                 
                 <div class="restriction-buttons">
-                    <button class="btn-add-restriction" onclick="añadirRestriccion()">
+                    <button class="btn-add-restriction" id="addRestriccion" onclick="añadirRestriccion()">
                         <i class="fas fa-plus"></i> Añadir Restricción
                     </button>
                 </div>
@@ -125,6 +124,21 @@
     <!-- Librerías -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
+
+    <!-- Script para mostrar/ocultar menú -->
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const closeMenu = document.getElementById('closeMenu');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    </script>
 </body>
 </html>
 

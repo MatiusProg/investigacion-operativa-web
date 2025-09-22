@@ -1,4 +1,18 @@
-const API_URL = 'http://localhost:5000/api/graphic';
+// Configuración de API URL para producción/desarrollo
+const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    
+    // Desarrollo local
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api/graphic';
+    }
+    
+    // Producción - GitHub Pages
+    return 'https://programacion-lineal-backend.onrender.com/api/graphic';
+};
+
+const API_URL = getApiUrl();
+console.log('🌐 URL de API configurada:', API_URL);
 
 // Estado de la aplicación
 let currentSolution = null;
@@ -85,6 +99,10 @@ async function resolverProblema() {
             })
         });
 
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('📊 Datos recibidos:', data);
 
@@ -97,6 +115,7 @@ async function resolverProblema() {
         mostrarResultados(data, 'interactive');
         
     } catch (error) {
+        console.error('❌ Error en resolverProblema:', error);
         alert('Error de conexión: ' + error.message);
     }
 }
@@ -219,34 +238,54 @@ function ejecutarScriptsPlotly() {
     });
 }
 
-// Método manual alternativo
-function initializePlotlyManual(plotlyHtml) {
-    const container = document.getElementById('plotly-container');
-    if (!container) return;
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = plotlyHtml;
-    
-    const plotlyDiv = tempDiv.querySelector('.plotly-graph-div');
-    const scripts = tempDiv.querySelectorAll('script');
-    
-    if (plotlyDiv) {
-        container.innerHTML = '';
-        container.appendChild(plotlyDiv.cloneNode(true));
-        
-        scripts.forEach(script => {
-            if (script.textContent.includes('Plotly.newPlot')) {
-                try {
-                    eval(script.textContent);
-                } catch (error) {
-                    console.log('Error ejecutando script manual:', error);
-                }
-            }
-        });
+// Función para cargar Plotly manualmente
+function cargarPlotlyManualmente() {
+    if (typeof Plotly === 'undefined') {
+        console.log('📦 Cargando Plotly desde CDN...');
+        const script = document.createElement('script');
+        script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
+        script.onload = function() {
+            console.log('✅ Plotly cargado manualmente');
+            ejecutarScriptsPlotly();
+        };
+        document.head.appendChild(script);
+    } else {
+        ejecutarScriptsPlotly();
     }
 }
 
-// Función para cambiar pestañas
+// Función para recrear Plotly desde los datos
+function recrearPlotlyDesdeDatos() {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    const script = container.querySelector('script');
+    if (!script) return;
+    
+    try {
+        // Extraer datos del script
+        const scriptContent = script.textContent;
+        const newPlotMatch = scriptContent.match(/Plotly\.newPlot\(['"]([^'"]+)['"],\s*(\[.*?\]),\s*(\{.*?\}),\s*(\{.*?\})\)/s);
+        
+        if (newPlotMatch && typeof Plotly !== 'undefined') {
+            const [_, id, dataStr, layoutStr, configStr] = newPlotMatch;
+            
+            // Parsear datos
+            const data = JSON.parse(dataStr);
+            const layout = JSON.parse(layoutStr);
+            const config = JSON.parse(configStr);
+            
+            // Limpiar contenedor y recrear
+            container.innerHTML = `<div id="${id}"></div>`;
+            Plotly.newPlot(id, data, layout, config);
+            
+            console.log('✅ Gráfico recreado manualmente desde datos');
+        }
+    } catch (error) {
+        console.log('❌ Error recreando gráfico:', error);
+    }
+}
+
 // Función para cambiar pestañas
 async function cambiarPestaña(tab) {
     if (!currentSolution) return;
@@ -276,6 +315,10 @@ async function cambiarPestaña(tab) {
                         optimization_type: optimizationType
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
                 
                 const staticData = await response.json();
                 if (staticData.error) throw new Error(staticData.error);
@@ -327,56 +370,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
     
     // Añadir restricción
-    document.getElementById('addRestriccion').addEventListener('click', function(e) {
-        e.preventDefault();
-        añadirRestriccion();
-    });
+    const addButton = document.getElementById('addRestriccion');
+    if (addButton) {
+        addButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            añadirRestriccion();
+        });
+    }
     
-    console.log('✅ Aplicación inicializada');
+    console.log('✅ Aplicación inicializada. API URL:', API_URL);
 });
-// Función para cargar Plotly manualmente
-function cargarPlotlyManualmente() {
-    if (typeof Plotly === 'undefined') {
-        console.log('📦 Cargando Plotly desde CDN...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
-        script.onload = function() {
-            console.log('✅ Plotly cargado manualmente');
-            ejecutarScriptsPlotly();
-        };
-        document.head.appendChild(script);
-    } else {
-        ejecutarScriptsPlotly();
-    }
-}
-// Función para recrear Plotly desde los datos
-function recrearPlotlyDesdeDatos() {
-    const container = document.getElementById('plotly-container');
-    if (!container) return;
-    
-    const script = container.querySelector('script');
-    if (!script) return;
-    
-    try {
-        // Extraer datos del script
-        const scriptContent = script.textContent;
-        const newPlotMatch = scriptContent.match(/Plotly\.newPlot\(['"]([^'"]+)['"],\s*(\[.*?\]),\s*(\{.*?\}),\s*(\{.*?\})\)/s);
-        
-        if (newPlotMatch && typeof Plotly !== 'undefined') {
-            const [_, id, dataStr, layoutStr, configStr] = newPlotMatch;
-            
-            // Parsear datos
-            const data = JSON.parse(dataStr);
-            const layout = JSON.parse(layoutStr);
-            const config = JSON.parse(configStr);
-            
-            // Limpiar contenedor y recrear
-            container.innerHTML = `<div id="${id}"></div>`;
-            Plotly.newPlot(id, data, layout, config);
-            
-            console.log('✅ Gráfico recreado manualmente desde datos');
-        }
-    } catch (error) {
-        console.log('❌ Error recreando gráfico:', error);
-    }
+
+// Remover console.log en producción (solo mantener para desarrollo)
+if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    console.log = function() {}; // Silenciar console.log en producción
 }
