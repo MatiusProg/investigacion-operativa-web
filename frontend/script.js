@@ -185,14 +185,41 @@ function initializePlotlyInteractive() {
             clearInterval(checkPlotlyLoaded);
             console.log('🎯 Plotly cargado, ejecutando scripts...');
             ejecutarScriptsPlotly();
+            
+            // Verificar después de un tiempo si se renderizó
+            setTimeout(() => {
+                const plotlyDiv = container.querySelector('.plotly-graph-div');
+                if (!plotlyDiv || plotlyDiv.children.length === 0) {
+                    console.log('⚠️  Gráfico no renderizado, intentando recrear...');
+                    recrearPlotlyDesdeDatos();
+                } else {
+                    console.log('✅ Gráfico interactivo mostrado correctamente');
+                }
+            }, 1000);
         }
     }, 100);
+    
+    // Timeout de seguridad
+    setTimeout(() => {
+        clearInterval(checkPlotlyLoaded);
+        if (typeof Plotly === 'undefined') {
+            console.log('⏰ Timeout: Cargando Plotly manualmente...');
+            cargarPlotlyManualmente();
+        }
+    }, 5000);
 }
 
 // Función para ejecutar scripts de Plotly
 function ejecutarScriptsPlotly() {
     const scripts = document.querySelectorAll('#plotly-container script');
     console.log(`📜 Encontrados ${scripts.length} scripts`);
+    
+    // Verificar si Plotly está cargado primero
+    if (typeof Plotly === 'undefined') {
+        console.log('⏳ Plotly no está cargado, esperando...');
+        setTimeout(ejecutarScriptsPlotly, 100);
+        return;
+    }
     
     scripts.forEach((script, index) => {
         try {
@@ -211,10 +238,59 @@ function ejecutarScriptsPlotly() {
     });
 }
 
+// Función para cargar Plotly manualmente
+function cargarPlotlyManualmente() {
+    if (typeof Plotly === 'undefined') {
+        console.log('📦 Cargando Plotly desde CDN...');
+        const script = document.createElement('script');
+        script.src = 'https://cdn.plot.ly/plotly-3.1.0.min.js';
+        script.onload = function() {
+            console.log('✅ Plotly cargado manualmente');
+            ejecutarScriptsPlotly();
+        };
+        document.head.appendChild(script);
+    } else {
+        ejecutarScriptsPlotly();
+    }
+}
+
+// Función para recrear Plotly desde los datos
+function recrearPlotlyDesdeDatos() {
+    const container = document.getElementById('plotly-container');
+    if (!container) return;
+    
+    const script = container.querySelector('script');
+    if (!script) return;
+    
+    try {
+        // Extraer datos del script
+        const scriptContent = script.textContent;
+        const newPlotMatch = scriptContent.match(/Plotly\.newPlot\(['"]([^'"]+)['"],\s*(\[.*?\]),\s*(\{.*?\}),\s*(\{.*?\})\)/s);
+        
+        if (newPlotMatch && typeof Plotly !== 'undefined') {
+            const [_, id, dataStr, layoutStr, configStr] = newPlotMatch;
+            
+            // Parsear datos
+            const data = JSON.parse(dataStr);
+            const layout = JSON.parse(layoutStr);
+            const config = JSON.parse(configStr);
+            
+            // Limpiar contenedor y recrear
+            container.innerHTML = `<div id="${id}"></div>`;
+            Plotly.newPlot(id, data, layout, config);
+            
+            console.log('✅ Gráfico recreado manualmente desde datos');
+        }
+    } catch (error) {
+        console.log('❌ Error recreando gráfico:', error);
+    }
+}
+
 // Función para cambiar pestañas
 async function cambiarPestaña(tab) {
     if (!currentSolution) return;
     
+    // Si vamos a interactivo y ya tenemos el gráfico, solo mostrarlo
     if (tab === 'interactive' && currentSolution.interactive_plot) {
         mostrarResultados(currentSolution, tab);
         return;
@@ -285,8 +361,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Cerrar menú
+    document.getElementById('closeMenu').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.remove('active');
+    });
+    
     // Botón resolver
     document.querySelector('.btn-resolver').addEventListener('click', resolverProblema);
+    
+    // Añadir restricción
+    const addButton = document.getElementById('addRestriccion');
+    if (addButton) {
+        addButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            añadirRestriccion();
+        });
+    }
     
     console.log('✅ Aplicación inicializada. API URL:', API_URL);
 });

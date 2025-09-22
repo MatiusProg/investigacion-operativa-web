@@ -169,7 +169,7 @@ class InteractiveLinearProgramming(LinearProgrammingProblem):
                         line=dict(width=1, color='gold')  # ← Borde rojo
                     ),
                     text=['ÓPTIMO'],
-                    textfont=dict(size=16, color='brown', weight='bold'),  # ← Texto rojo
+                    textfont=dict(size=16, color='brown', family='Arial, bold'),
                     textposition='top center',
                     name=f'Óptimo: ({optimal_point[0]:.2f}, {optimal_point[1]:.2f})',
                     hoverinfo='text',

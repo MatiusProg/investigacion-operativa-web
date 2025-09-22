@@ -6,23 +6,25 @@ import os
 def create_app():
     app = Flask(__name__)
     
-    # Configuración CORS para producción/desarrollo
-    is_production = os.environ.get('FLASK_ENV') == 'production'
-    
-    if is_production:
-        # En producción: dominios específicos
-        frontend_urls = [
+    # Configuración CORS mejorada
+    def get_allowed_origins():
+        origins = [
+            "http://localhost:8000",
+            "http://127.0.0.1:8000", 
+            "http://localhost:3000",
             "https://matiusprog.github.io",
-            "https://matiusprog.github.io/investigacion-operativa-web",
-            "http://localhost:3000"  # Para desarrollo local
+            "https://matiusprog.github.io/investigacion-operativa-web"
         ]
-    else:
-        # En desarrollo: permitir todos los orígenes
-        frontend_urls = "*"
+        
+        # Agregar origen dinámico para desarrollo
+        if os.environ.get('FLASK_ENV') != 'production':
+            origins.append("*")  # Permitir todos en desarrollo
+        
+        return origins
     
     CORS(app, resources={
         r"/api/*": {
-            "origins": frontend_urls,
+            "origins": get_allowed_origins(),
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -30,7 +32,7 @@ def create_app():
     })
     
     # Configuración adicional para producción
-    if is_production:
+    if os.environ.get('FLASK_ENV') == 'production':
         app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
         app.config['PROPAGATE_EXCEPTIONS'] = True
     
@@ -41,7 +43,6 @@ def create_app():
         print("✅ Rutas de la API registradas correctamente")
     except ImportError as e:
         print(f"❌ Error importando rutas: {e}")
-        # Crear ruta básica de salud para verificar que el servidor funciona
         @app.route('/api/graphic/health')
         def health_check():
             return {"status": "OK", "message": "Servidor funcionando"}
@@ -51,15 +52,6 @@ def create_app():
 # Crear aplicación
 app = create_app()
 
-# Solo para ejecución local directa
 if __name__ == '__main__':
     print("🚀 Iniciando servidor...")
-    print("📊 Endpoints disponibles:")
-    print("   • POST /api/graphic/solve/interactive")
-    print("   • POST /api/graphic/solve/static")
-    print("   • GET  /api/graphic/health")
-    print("   • GET  /api/graphic/example")
-    
-    # Determinar si es producción
-    debug_mode = os.environ.get('FLASK_ENV') != 'production'
-    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+    app.run(debug=os.environ.get('FLASK_ENV') != 'production', host='0.0.0.0', port=5000)

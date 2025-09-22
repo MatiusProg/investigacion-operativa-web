@@ -1,11 +1,15 @@
 services:
   - type: web
-    name: investigacion-operativa-api
+    name: programacion-lineal-backend
     env: python
     plan: free
-    buildCommand: pip install -r requirements-prod.txt
-    startCommand: gunicorn wsgi:app --timeout 120
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements-prod.txt
+    startCommand: gunicorn wsgi:app --timeout 120 --workers 2
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: FLASK_ENV
+        value: production
     healthCheckPath: /api/graphic/health
