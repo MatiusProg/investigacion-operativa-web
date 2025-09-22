@@ -182,19 +182,18 @@ class InteractiveLinearProgramming(LinearProgrammingProblem):
                 title=dict(
                     text='<b>SOLUCIÓN MÉTODO GRÁFICO</b><br><sub>Programación Lineal</sub>',
                     x=0.5,
-                    font=dict(size=22, family='Arial', color='#2c3e50'),
-                    y=0.95 #Para move el titulo más arriba
+                    font=dict(size=22, family='Arial', color='#2c3e50')
                 ),
                 xaxis=dict(
-                    title=dict(text='<b>VARIABLE X</b>', font=dict(size=14, color='black')),
+                    title=dict(text='<b>VARIABLE X</b>', font=dict(size=16, color='black')),
                     range=[-max_x*0.1, max_x*1.1],
                     gridcolor='rgba(200, 200, 200, 0.8)',  # ← Grid MUY suave
                     zeroline=False,
                     showgrid=True,
-                    tickfont=dict(size=10, color='black'),
+                    tickfont=dict(size=12, color='black'),
                     showline=True,  # ← Mostrar línea del eje
                     linecolor='black',  # ← Color de línea del eje
-                    linewidth=2  # ← Grosor de línea del eje
+                    linewidth=3  # ← Grosor de línea del eje
                 ),
                 yaxis=dict(
                     title=dict(text='<b>VARIABLE Y</b>', font=dict(size=16, color='black')),
@@ -202,29 +201,28 @@ class InteractiveLinearProgramming(LinearProgrammingProblem):
                     gridcolor='rgba(200, 200, 200, 0.8)',  # ← Grid MUY suave
                     zeroline=True,
                     showgrid=True,
-                    tickfont=dict(size=10 color='black'),
+                    tickfont=dict(size=12, color='black'),
                     showline=True,  # ← Mostrar línea del eje
                     linecolor='black',  # ← Color de línea del eje
-                    linewidth=2  # ← Grosor de línea del eje
+                    linewidth=3  # ← Grosor de línea del eje
                 ),
                 legend=dict(
-                    x=1.02,
+                    x=1.05,
                     y=1,
                     xanchor='left',
                     yanchor='top',
                     bgcolor='rgba(255, 255, 255, 0.9)',
                     bordercolor='gray',
                     borderwidth=1,
-                    font=dict(size=10),
-                    orientation='v'
+                    font=dict(size=11)
                 ),
                 hovermode='closest',
-                width=800,
-                height=500,
+                width=1000,
+                height=700,
                 plot_bgcolor='white',
                 paper_bgcolor='white',
-                margin=dict(l=50, r=150, t=80, b=50),
-                font=dict(family='Arial', size=10, color='#2c3e50')
+                margin=dict(l=80, r=80, t=100, b=80),
+                font=dict(family='Arial', size=12, color='#2c3e50')
             )
             
             # HABILITAR INTERACTIVIDAD
