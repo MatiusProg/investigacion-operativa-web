@@ -405,7 +405,7 @@ input[type="text"] {
   max-height: 600px;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  overflow: hidden; /* Cambiado de hidden a auto */
+  overflow: auto; /* Cambiado de hidden a auto */
   margin: 15px 0;
   background: white;
   display: flex;
@@ -418,7 +418,9 @@ input[type="text"] {
 #plotly-container .plotly-graph-div {
   width: 100% !important;
   height: 500px !important;
-  overflow: auto !important;
+  max-width: 900px !important;
+  transform: scale(0.85); /* ← REDUCE EL TAMAÑO */
+  transform-origin: center center;
 }
 
 /* SVG dentro de Plotly */
@@ -436,12 +438,9 @@ input[type="text"] {
 .modebar {
   background: rgba(255, 255, 255, 0.95) !important;
   border-radius: 4px !important;
-  padding: 4px !important;
+  padding: 3px !important;
   border: 1px solid #e0e0e0 !important;
-  position: absolute !important;
-  top: 10px !important;
-  right: 10px !important;
-  z-index: 1000 !important;
+  font-size: 10px !important;
 }
 
 .modebar-group {
@@ -678,7 +677,6 @@ footer nav a:hover {
   }
   
   #plotly-container .plotly-graph-div {
-    transform: scale(0.65); /* ← MÁXIMA REDUCCIÓN */
     height: 400px !important;
   }
   
