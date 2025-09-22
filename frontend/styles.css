@@ -661,8 +661,8 @@ footer nav a:hover {
 
 /* Asegurar que el gráfico ocupe todo el espacio */
 #grafico-interactivo .plotly-graph-div {
-    width: 100% !important;
-    height: 100% !important;
+    width: 60% !important;
+    height: 60% !important;
 }
 
 /* Mensaje cuando no hay gráfico */
