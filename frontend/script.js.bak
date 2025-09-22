@@ -1,9 +1,9 @@
 // VERSI車N M赤NIMA PARA PRUEBAS
-console.log('? script.js cargado correctamente');
+console.log('script.js cargado correctamente');
 
 // Funci車n b芍sica para probar
 function eliminarRestriccion(boton) {
-    console.log('? eliminarRestriccion funciona');
+    console.log('eliminarRestriccion funciona');
     const restrictionItem = boton.closest('.restriction-item');
     if (restrictionItem) {
         restrictionItem.remove();
@@ -11,7 +11,7 @@ function eliminarRestriccion(boton) {
 }
 
 function a?adirRestriccion() {
-    console.log('? a?adirRestriccion funciona');
+    console.log('a?adirRestriccion funciona');
     const restriccionesDiv = document.getElementById('restricciones');
     const newItem = document.createElement('div');
     newItem.className = 'restriction-item';
@@ -26,13 +26,13 @@ function a?adirRestriccion() {
 
 // Bot車n resolver b芍sico
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('? DOM cargado');
+    console.log('DOM cargado');
     
     // Bot車n resolver
     const resolverBtn = document.querySelector('.btn-resolver');
     if (resolverBtn) {
         resolverBtn.addEventListener('click', function() {
-            console.log('? Bot車n resolver funciona');
+            console.log('Bot車n resolver funciona');
             alert('Funcionalidad de resolver en desarrollo');
         });
     }
