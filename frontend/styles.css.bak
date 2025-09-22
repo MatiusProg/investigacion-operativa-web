@@ -694,7 +694,7 @@ footer nav a:hover {
 /* Forzar tamaño del gráfico Plotly */
 #plotly-container .plotly-graph-div {
     width: 100% !important;
-    height: 500px !important;
+    height: 100% !important;
 }
 
 /* Loading para gráficos */
