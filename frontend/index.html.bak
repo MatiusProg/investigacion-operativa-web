@@ -140,59 +140,7 @@
             sidebar.classList.remove('active');
         });
     </script>
-	<script>
-// CÓDIGO TEMPORAL INLINE
-console.log('✅ JavaScript inline cargado');
-
-function eliminarRestriccion(boton) {
-    console.log('Eliminar restricción');
-    const restrictionItem = boton.closest('.restriction-item');
-    if (restrictionItem) {
-        restrictionItem.remove();
-    }
-}
-
-function añadirRestriccion() {
-    console.log('Añadir restricción');
-    const restriccionesDiv = document.getElementById('restricciones');
-    const newItem = document.createElement('div');
-    newItem.className = 'restriction-item';
-    newItem.innerHTML = `
-        <input type="text" placeholder="Ej: 2x + y <= 100">
-        <button class="btn-remove-restriction" onclick="eliminarRestriccion(this)">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    restriccionesDiv.appendChild(newItem);
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM cargado');
-    
-    // Botón añadir restricción
-    const addButton = document.getElementById('addRestriccion');
-    if (addButton) {
-        addButton.addEventListener('click', añadirRestriccion);
-    }
-    
-    // Botón resolver
-    const resolverBtn = document.querySelector('.btn-resolver');
-    if (resolverBtn) {
-        resolverBtn.addEventListener('click', function() {
-            alert('Funcionalidad de resolver pronto');
-        });
-    }
-    
-    // Botones de optimización
-    document.querySelectorAll('.opt-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-});
-</script>
+	
 </body>
 </html>
 

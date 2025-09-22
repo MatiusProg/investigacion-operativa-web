@@ -1,3 +1,6 @@
+/* ===== IMPORTS - DEBE SER LA PRIMERA LÍNEA ===== */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
 /* ===== RESET Y CONFIGURACIÓN GENERAL ===== */
 * {
   margin: 0;
@@ -5,9 +8,6 @@
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
-
-/* Iconos de Font Awesome */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 /* Layout principal */
 body {
@@ -179,7 +179,7 @@ body {
   margin-bottom: 15px;
 }
 
-/* Inputs */
+/* Inputs - CORREGIDOS CON ID Y NAME */
 input[type="text"] {
   width: 100%;
   padding: 8px;
@@ -398,25 +398,21 @@ input[type="text"] {
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-/* ===== GRÁFICOS INTERACTIVOS (PLOTLY) ===== */
+/* ===== GRÁFICOS INTERACTIVOS (PLOTLY) - CORREGIDO ===== */
 #plotly-container {
-  width: 100% !important;
+  width: 100%;
   min-height: 500px;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto; /* Cambiado de hidden a auto */
   margin: 15px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: white;
 }
 
-/* CONTROLES DE TAMAÑO PARA PLOTLY */
+/* CONTROLES SIMPLIFICADOS PARA PLOTLY */
 #plotly-container .plotly-graph-div {
   width: 100% !important;
   height: 500px !important;
-  max-width: 100% !important;
-  margin: 0 auto !important;
 }
 
 /* SVG dentro de Plotly */

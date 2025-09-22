@@ -54,11 +54,10 @@ function eliminarRestriccion(boton) {
 // Funcion para añadir restriccion
 function añadirRestriccion() {
     const restriccionesDiv = document.getElementById('restricciones');
-    const count = restriccionesDiv.children.length + 1;
     const newItem = document.createElement('div');
     newItem.className = 'restriction-item';
     newItem.innerHTML = `
-        <input type="text" placeholder="Ej: 2x + y <= 100" id="restriccion-${count}" name="restriccion-${count}">
+        <input type="text" placeholder="Ej: 2x + y <= 100">
         <button class="btn-remove-restriction" onclick="eliminarRestriccion(this)">
             <i class="fas fa-times"></i>
         </button>
