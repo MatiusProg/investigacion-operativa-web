@@ -409,7 +409,7 @@ input[type="text"] {
   margin: 15px 0;
   background: white;
   display: flex;
-  justify-content: center;
+  justify-content: flex;
   align-items: flex-start;
   padding: 10px;
 }
@@ -420,7 +420,7 @@ input[type="text"] {
   height: 500px !important;
   max-width: 900px !important;
   transform: scale(0.85); /* ← REDUCE EL TAMAÑO */
-  transform-origin: center center;
+  /*transform-origin: center center;*/
 }
 
 /* SVG dentro de Plotly */
@@ -438,7 +438,7 @@ input[type="text"] {
 .modebar {
   background: rgba(255, 255, 255, 0.95) !important;
   border-radius: 4px !important;
-  padding: 3px !important;
+  padding: 1px !important;
   border: 1px solid #e0e0e0 !important;
   font-size: 10px !important;
 }
@@ -655,7 +655,7 @@ footer nav a:hover {
     height: 450px !important;
   }
   .modebar {
-    transform: scale(0.8);
+    transform: scale(0.7);
     transform-origin: top right;
   }
 }
@@ -681,6 +681,6 @@ footer nav a:hover {
   }
   
   .modebar {
-    transform: scale(0.7);
+    transform: scale(0.6);
   }
 }
