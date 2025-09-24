@@ -652,11 +652,11 @@ footer nav a:hover {
   }
   
   #plotly-container .plotly-graph-div {
-    transform: scale(0.75); /* ← MÁS REDUCCIÓN EN MÓVIL */
+    transform: scale(0.6); /* ← MÁS REDUCCIÓN EN MÓVIL */
     height: 450px !important;
   }
   .modebar {
-    transform: scale(0.7);
+    transform: scale(0.3);
     transform-origin: top right;
   }
 }
@@ -679,9 +679,11 @@ footer nav a:hover {
   
   #plotly-container .plotly-graph-div {
     height: 400px !important;
+	transform: scale(0.5); /* ← MÁS REDUCCIÓN EN MÓVIL */
   }
   
   .modebar {
-    transform: scale(0.6);
+    transform: scale(0.3);
+    transform-origin: top right;
   }
 }
