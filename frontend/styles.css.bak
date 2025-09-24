@@ -420,7 +420,7 @@ input[type="text"] {
   height: 100% !important;
   max-width: 100% !important;
   transform: scale(0.85); /* ← REDUCE EL TAMAÑO */
-  /*transform-origin: center center;*/
+  transform-origin: center left;
 }
 
 /* SVG dentro de Plotly */
@@ -441,11 +441,11 @@ input[type="text"] {
   padding: 3px !important;
   border: 1px solid #e0e0e0 !important;
   font-size: 10px !important;
-  transform-origin: rigth;
+  /*transform-origin: rigth;*/
 }
 
 .modebar-group {
-  background: transparent !important;
+  /*background: transparent !important;*/
 }
 
 /* Tooltips de Plotly */
@@ -657,7 +657,6 @@ footer nav a:hover {
   }
   .modebar {
     transform: scale(0.3);
-    transform-origin: top right;
   }
 }
 
@@ -684,6 +683,5 @@ footer nav a:hover {
   
   .modebar {
     transform: scale(0.3);
-    transform-origin: top right;
   }
 }
