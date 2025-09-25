@@ -2,6 +2,8 @@
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
 ![Plotly](https://img.shields.io/badge/Plotly-Interactive-orange)
+![License](https://img.shields.io/badge/license-Academic-blue)
+![Status](https://img.shields.io/badge/status-production-green)
 
 Web para resolver problemas de investigación operativa usando el método gráfico (de momento). El dia de hoy comenzamos con el trabaajo arduo
 
@@ -39,14 +41,15 @@ investigacion-operativa-web/
 	└── api-reference.md
 	
 ## Instalación Local
+
 ### Backend
-```bash
+bash
 cd backend
 pip install -r requirements-prod.txt
-python app.p ```
+python app.p
 ### Frontend
-```cd frontend
-python -m http.server 8000```
+cd frontend
+python -m http.server 8000
 
 ## Licencia
 

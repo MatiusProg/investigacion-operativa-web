@@ -23,3 +23,31 @@
 ### 3. Determinacion de la region factible
 
 
+## API Endpoints
+
+### POST /api/graphic/solve/interactive
+{
+  "objective": "maximize 3x + 2y",
+  "constraints": ["2x + y <= 100", "x + y <= 80"],
+  "optimization_type": "maximize"
+}
+
+### POST /api/graphic/solve/static
+{
+  "objective": "minimize 4x + 3y", 
+  "constraints": ["x + 2y >= 40", "3x + y >= 45"],
+  "optimization_type": "minimize"
+}
+
+## Despliegue
+
+### Backend (Render.com)
+- Runtime: Python 3.11
+- WSGI: Gunicorn
+- Health check: /api/graphic/health
+
+### Frontend (GitHub Pages)
+- Build: GitHub Actions
+- Source: Carpeta frontend/
+- URL: https://matiusprog.github.io/investigacion-operativa-web/
+
