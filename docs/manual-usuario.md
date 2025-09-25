@@ -1,4 +1,4 @@
-#Manual de Usuario
+# Manual de Usuario
 
 ## Como usar la Aplicación
 

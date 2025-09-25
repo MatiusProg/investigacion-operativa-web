@@ -51,10 +51,10 @@ pip install flask flask-cors numpy matplotlib plotly scipy
 
 ### Error: Puerto en uso
 
-# Cambiar puerto del backend
+**Cambiar puerto del backend**
 python app.py --port 5001
 
-# Cambiar puerto del frontend  
+**Cambiar puerto del frontend**  
 python -m http.server 8001
 
 
